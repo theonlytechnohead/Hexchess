@@ -1,0 +1,32 @@
+html, body {
+	margin: 0;
+	height: 100%;
+}
+
+body {
+	font-family: system-ui;
+	background-color: hsl(270, 75%, 25%);
+	color: white;
+	display: grid;
+	justify-content: center;
+}
+
+main {
+	display: flex;
+	flex-direction: column;
+	width: min(75em, 100vw);
+	margin: auto;
+	text-align: center;
+}
+
+h1 {
+	font-size: min(5em, 15vw);
+}
+
+p {
+	font-size: min(2em, 4vw);
+}
+
+a {
+	color: white;
+}
