@@ -27,10 +27,8 @@
 }
 
 main {
-	display: flex;
-	--height: min(5em, 8vw);
-	--margin: min(0.25em, 0.5vw);
-	--offset: calc(var(--height) * 1.732 + 4 * var(--margin) - 1px);
+	--height: min(5em, 8vw, 8vh);
+	--margin: calc(var(--height) / 20);
 }
 
 board {
