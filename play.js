@@ -29,6 +29,9 @@ var possible = [];
 function createBoard() {
 	pulse = document.createElement("pulse");
 	document.getElementsByTagName("main")[0].appendChild(pulse);
+	setTimeout(() => {
+		pulse.destroy();
+	}, 1000);
 	board = document.createElement("board");
 	document.body.onclick = (e) => {
 		deselect();

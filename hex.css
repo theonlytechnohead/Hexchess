@@ -184,12 +184,12 @@ hex p.white {
 	}
 	100% {
 		opacity: 0;
-		transform: scale(11);
+		transform: scale(15);
 	}
 }
 
 pulse {
-	position: absolute;
+	position: fixed;
 	background: radial-gradient(circle at center, transparent 0%, white 40%, transparent 60%);
 	height: calc(var(--height) * 1.05);
 	width: calc(var(--height) * 0.95);
