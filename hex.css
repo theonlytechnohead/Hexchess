@@ -2,6 +2,8 @@
 	--tile3: hsl(250, 75%, 50%);
 	--tile2: hsl(270, 75%, 50%);
 	--tile1: hsl(290, 75%, 50%);
+	--selected: hsl(50, 50%, 50%);
+	--possible: hsl(25, 75%, 50%);
 	--whiteOutline: white;
 	--blackOutline: white;
 }
@@ -11,6 +13,8 @@
 		--tile3: hsl(90, 75%, 50%);
 		--tile2: hsl(180, 75%, 50%);
 		--tile1: hsl(270, 75%, 50%);
+		--selected: hsl(50, 100%, 50%);
+		--possible: hsl(25, 100%, 50%);
 		--whiteOutline: white;
 		--blackOutline: black;
 	}
@@ -21,6 +25,8 @@
 		--tile3: hsl(260, 90%, 50%);
 		--tile2: hsl(270, 90%, 50%);
 		--tile1: hsl(280, 90%, 50%);
+		--selected: hsl(50, 35%, 40%);
+		--possible: hsl(25, 45%, 50%);
 		--whiteOutline: none;
 		--blackOutline: none;
 	}
@@ -36,15 +42,23 @@ board {
 	margin-bottom: calc(var(--height) / 2 + var(--margin));
 }
 
-board :nth-child(3n)>hex {
+hex {
+	background-color: red;
+}
+
+hex.disabled {
+	background-color: transparent;
+}
+
+hex.tile1 {
 	background-color: var(--tile1);
 }
 
-board :nth-child(3n-1)>hex {
+hex.tile2 {
 	background-color: var(--tile2);
 }
 
-board :nth-child(3n - 2)>hex {
+hex.tile3 {
 	background-color: var(--tile3);
 }
 
@@ -64,7 +78,6 @@ hex {
 	width: var(--height);
 	height: var(--height);
 	margin: var(--margin);
-	user-select: none;
 	text-align: center;
 	line-height: var(--height);
 	/* flat-topped hexagon */
@@ -79,31 +92,39 @@ hex {
 	}
 }
 
-hex:hover {
+hex:hover:not(.disabled) {
 	filter: brightness(1.15);
 }
 
-hex:active {
+hex.selected:not(.disabled) {
+	background-color: var(--selected);
+}
+
+hex.possible:not(.disabled) {
+	background-color: var(--possible);
+}
+
+hex:active:not(.disabled) {
 	transition: none;
 	filter: brightness(0.85);
 }
 
 @media (prefers-contrast: more) {
-	hex:hover {
+	hex:hover:not(.disabled) {
 		filter: brightness(1.5);
 	}
 
-	hex:active {
+	hex:active:not(.disabled) {
 		filter: brightness(0.75);
 	}
 }
 
 @media (prefers-contrast: less) {
-	hex:hover {
+	hex:hover:not(.disabled) {
 		filter: brightness(1.05);
 	}
 
-	hex:active {
+	hex:active:not(.disabled) {
 		filter: brightness(0.95);
 	}
 }
@@ -122,7 +143,7 @@ p {
 	margin: 0;
 	font-family: "Chess";
 	font-size: calc(var(--height) / 2);
-	
+	user-select: none;
 }
 
 p.black {
