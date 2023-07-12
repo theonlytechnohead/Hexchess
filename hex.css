@@ -139,19 +139,19 @@ hex:active:not(.disabled) {
 	font-style: normal;
 }
 
-p {
+hex p {
 	margin: 0;
 	font-family: "Chess";
 	font-size: calc(var(--height) / 2);
 	user-select: none;
 }
 
-p.black {
+hex p.black {
 	color: black;
 	-webkit-text-stroke: 0.05em var(--blackOutline);
 }
 
-p.white {
+hex p.white {
 	color: white;
 	-webkit-text-stroke: 0.025em var(--whiteOutline);
 }

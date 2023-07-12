@@ -1,4 +1,5 @@
-window.onload = () => {
+function play() {
+	document.getElementById("play").remove();
 	createBoard();
 	setBoard();
 };
@@ -26,7 +27,7 @@ var selectedColumn = null;
 var possible = [];
 
 function createBoard() {
-	board = document.getElementsByTagName("board")[0];
+	board = document.createElement("board");
 	document.body.onclick = (e) => {
 		deselect();
 	}
@@ -80,6 +81,7 @@ function createBoard() {
 		}
 		board.appendChild(row);
 	}
+	document.getElementsByTagName("main")[0].appendChild(board);
 }
 
 function setBoard() {
