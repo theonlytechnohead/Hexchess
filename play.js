@@ -173,7 +173,8 @@ function highlight(row, column) {
 	h = r.children[column];
 	if (h == undefined)
 		return;
-	h.classList.toggle("possible");
+	if (!whitePieces.includes(h.innerText))
+		h.classList.toggle("possible");
 }
 
 function applyHighlight() {
