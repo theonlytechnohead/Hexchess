@@ -1,20 +1,53 @@
+:root {
+	--tile3: hsl(250, 75%, 50%);
+	--tile2: hsl(270, 75%, 50%);
+	--tile1: hsl(290, 75%, 50%);
+	--whiteOutline: white;
+	--blackOutline: white;
+}
+
+@media (prefers-contrast: more) {
+	:root {
+		--tile3: hsl(90, 75%, 50%);
+		--tile2: hsl(180, 75%, 50%);
+		--tile1: hsl(270, 75%, 50%);
+		--whiteOutline: white;
+		--blackOutline: black;
+	}
+}
+
+@media (prefers-contrast: less) {
+	:root {
+		--tile3: hsl(260, 90%, 50%);
+		--tile2: hsl(270, 90%, 50%);
+		--tile1: hsl(280, 90%, 50%);
+		--whiteOutline: none;
+		--blackOutline: none;
+	}
+}
+
 main {
 	display: flex;
-	--height: 6em;
+	--height: 5em;
 	--margin: 0.25em;
 	--offset: calc(var(--height) * 1.732 + 4 * var(--margin) - 1px);
 }
 
-board :nth-child(3n)>* {
-	background-color: red;
+board {
+	/* offset to make up for the last row */
+	margin-bottom: calc(var(--height) / 2 + var(--margin));
 }
 
-board :nth-child(3n-1)>* {
-	background-color: limegreen;
+board :nth-child(3n)>hex {
+	background-color: var(--tile1);
 }
 
-board :nth-child(3n - 2)>* {
-	background-color: deepskyblue;
+board :nth-child(3n-1)>hex {
+	background-color: var(--tile2);
+}
+
+board :nth-child(3n - 2)>hex {
+	background-color: var(--tile3);
 }
 
 row {
@@ -33,9 +66,73 @@ hex {
 	width: var(--height);
 	height: var(--height);
 	margin: var(--margin);
+	user-select: none;
 	text-align: center;
 	line-height: var(--height);
 	/* flat-topped hexagon */
 	-webkit-clip-path: polygon(25% 5%, 75% 5%, 100% 50%, 75% 95%, 25% 95%, 0% 50%);
 	clip-path: polygon(25% 5%, 75% 5%, 100% 50%, 75% 95%, 25% 95%, 0% 50%);
+	transition: filter 0.15s ease-in-out;
+}
+
+@media (prefers-reduced-motion) {
+	hex {
+		transition: none;
+	}
+}
+
+hex:hover {
+	filter: brightness(1.15);
+}
+
+hex:active {
+	transition: none;
+	filter: brightness(0.85);
+}
+
+@media (prefers-contrast: more) {
+	hex:hover {
+		filter: brightness(1.5);
+	}
+
+	hex:active {
+		filter: brightness(0.75);
+	}
+}
+
+@media (prefers-contrast: less) {
+	hex:hover {
+		filter: brightness(1.05);
+	}
+
+	hex:active {
+		filter: brightness(0.95);
+	}
+}
+
+@font-face {
+	font-family: 'Chess';
+	src: url('webfonts_Chess/Chess.ttf.woff') format('woff'),
+		url('webfonts_Chess/Chess.ttf.svg#Chess') format('svg'),
+		url('webfonts_Chess/Chess.ttf.eot'),
+		url('webfonts_Chess/Chess.ttf.eot?#iefix') format('embedded-opentype');
+	font-weight: normal;
+	font-style: normal;
+}
+
+p {
+	margin: 0;
+	font-family: "Chess";
+	font-size: calc(var(--height) / 2);
+	
+}
+
+p.black {
+	color: black;
+	-webkit-text-stroke: 0.05em var(--blackOutline);
+}
+
+p.white {
+	color: white;
+	-webkit-text-stroke: 0.025em var(--whiteOutline);
 }
