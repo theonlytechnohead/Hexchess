@@ -43,11 +43,13 @@ board {
 }
 
 hex {
-	background-color: red;
+	background-color: var(--background);
+	animation: tile 0.75s ease-in-out 1.15s 1 both;
 }
 
 hex.disabled {
 	background-color: transparent;
+	animation: none;
 }
 
 hex.tile1 {
@@ -144,6 +146,7 @@ hex p {
 	font-family: "Chess";
 	font-size: calc(var(--height) / 2);
 	user-select: none;
+	animation: fade 0.5s ease-in-out 1.5s 1 both;
 }
 
 hex p.black {
@@ -154,4 +157,44 @@ hex p.black {
 hex p.white {
 	color: white;
 	-webkit-text-stroke: 0.025em var(--whiteOutline);
+}
+
+@keyframes fade {
+	from {
+		opacity: 0;
+	}
+	to {
+		opacity: 1;
+	}
+}
+
+@keyframes tile {
+	from {
+		background-color: var(--background);
+	}
+}
+
+@keyframes pulse {
+	0% {
+		opacity: 0;
+		transform: scale(1);
+	}
+	50% {
+		opacity: 0.5;
+	}
+	100% {
+		opacity: 0;
+		transform: scale(11);
+	}
+}
+
+pulse {
+	position: absolute;
+	background: radial-gradient(circle at center, transparent 0%, white 40%, transparent 60%);
+	height: calc(var(--height) * 1.05);
+	width: calc(var(--height) * 0.95);
+	
+	animation: pulse 1s ease-out 0s 1 forwards;
+	-webkit-clip-path: polygon(50% 0%, 95% 25%, 95% 75%, 50% 100%, 5% 75%, 5% 25%);
+	clip-path: polygon(50% 0%, 95% 25%, 95% 75%, 50% 100%, 5% 75%, 5% 25%);
 }

@@ -27,6 +27,8 @@ var selectedColumn = null;
 var possible = [];
 
 function createBoard() {
+	pulse = document.createElement("pulse");
+	document.getElementsByTagName("main")[0].appendChild(pulse);
 	board = document.createElement("board");
 	document.body.onclick = (e) => {
 		deselect();
