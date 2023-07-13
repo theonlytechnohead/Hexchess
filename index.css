@@ -28,6 +28,20 @@ header {
 	align-items: center;
 }
 
+footer {
+	position: absolute;
+	left: 1em;
+	right: 1em;
+	bottom: 1em;
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+}
+
+footer p {
+	font-size: min(1.5em, 4vw);
+}
+
 main {
 	display: flex;
 	flex-direction: column;
