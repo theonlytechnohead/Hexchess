@@ -27,33 +27,33 @@ var selectedColumn = null;
 var possible = [];
 
 function createBoard() {
-	pulse = document.createElement("pulse");
+	let pulse = document.createElement("pulse");
 	document.getElementsByTagName("main")[0].appendChild(pulse);
 	setTimeout(() => {
 		pulse.remove();
 	}, 1000);
-	board = document.createElement("board");
+	let board = document.createElement("board");
 	document.body.onclick = (e) => {
 		deselect();
 	}
 	for (let r = 1; r < 22; r++) {
-		row = document.createElement("row");
+		let row = document.createElement("row");
 		if (r < 6) {
-			n = r;
-			m = Math.min(4 - n + (r + 1) % 2, 2);
+			var n = r;
+			var m = Math.min(4 - n + (r + 1) % 2, 2);
 		} else if (r < 17) {
 			if (r % 2)
-				n = 5;
+				var n = 5;
 			else
-				n = 6;
-			m = 0;
+				var n = 6;
+			var m = 0;
 		} else {
-			n = 22 - r;
-			m = Math.min(4 - n + (r + 1) % 2, 2);
+			var n = 22 - r;
+			var m = Math.min(4 - n + (r + 1) % 2, 2);
 		}
 
 		for (let h = 0; h < 6 - r % 2; h++) {
-			hex = document.createElement("hex");
+			let hex = document.createElement("hex");
 			if (h < m) {
 				hex.classList.add("disabled");
 			} else if (m <= h && h < 6 - m - r % 2) {
@@ -80,7 +80,7 @@ function createBoard() {
 			} else {
 				hex.classList.add("disabled");
 			}
-			p = document.createElement("p");
+			let p = document.createElement("p");
 			hex.appendChild(p);
 			row.appendChild(hex);
 		}
@@ -131,10 +131,10 @@ function setBoard() {
 
 
 function setPieceRaw(row, column, piece) {
-	board = document.getElementsByTagName("board")[0];
-	r = board.children[row];
-	h = r.children[column];
-	p = h.children[0];
+	let board = document.getElementsByTagName("board")[0];
+	let r = board.children[row];
+	let h = r.children[column];
+	let p = h.children[0];
 	p.textContent = piece;
 	if (blackPieces.includes(piece))
 		p.classList.add("black");
@@ -157,11 +157,11 @@ function deselect() {
 }
 
 function move(fromRow, fromColumn, toRow, toColumn) {
-	board = document.getElementsByTagName("board")[0];
-	r = board.children[fromRow];
-	h = r.children[fromColumn];
-	p = h.children[0];
-	piece = p.textContent;
+	let board = document.getElementsByTagName("board")[0];
+	let r = board.children[fromRow];
+	let h = r.children[fromColumn];
+	let p = h.children[0];
+	let piece = p.textContent;
 	// clear piece
 	p.textContent = "";
 
@@ -193,9 +193,9 @@ function selectSquare(row, column) {
 }
 
 function highlight(row, column) {
-	board = document.getElementsByTagName("board")[0];
-	r = board.children[row];
-	h = r.children[column];
+	let board = document.getElementsByTagName("board")[0];
+	let r = board.children[row];
+	let h = r.children[column];
 	h.classList.toggle("possible");
 }
 
@@ -209,14 +209,16 @@ function showPossible(row, column) {
 	applyHighlight();
 	// clear array
 	possible.length = 0;
-	board = document.getElementsByTagName("board")[0];
-	r = board.children[row];
-	h = r.children[column];
-	p = h.children[0];
-	piece = p.textContent;
+	let board = document.getElementsByTagName("board")[0];
+	let r = board.children[row];
+	let h = r.children[column];
+	let p = h.children[0];
+	let piece = p.textContent;
 
-	needsFilter = false;
-	offset = row % 2;
+	let needsFilter = false;
+	let offset = row % 2;
+	let currentRow;
+	let currentColumn;
 	switch (piece) {
 		case whitePawn:
 			// starting row (white)
@@ -821,16 +823,16 @@ function showPossible(row, column) {
 	}
 	// filter invalid moves
 	function invalid(value, index, array) {
-		row = value[0];
-		column = value[1];
-		r = board.children[row];
+		let row = value[0];
+		let column = value[1];
+		let r = board.children[row];
 		if (r == undefined)
 			return false;
-		h = r.children[column];
+		let h = r.children[column];
 		if (h == undefined)
 			return false;
-		p = h.children[0];
-		piece = p.textContent;
+		let p = h.children[0];
+		let piece = p.textContent;
 		if (whitePieces.includes(piece))
 			return false;
 		return true;
