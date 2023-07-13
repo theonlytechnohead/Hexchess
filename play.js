@@ -164,21 +164,21 @@ function move(fromRow, fromColumn, toRow, toColumn) {
 	let h = r.children[fromColumn];
 	let p = h.children[0];
 	let piece = p.textContent;
+	// clear piece
+	p.textContent = "";
 	if (piece === whitePawn) {
-		moves = en_passant(fromRow, fromColumn);
+		let moves = en_passant(fromRow, fromColumn);
 		if (moves.length) {
 			if (moves[0][0] === toRow && moves[0][1] === toColumn) {
 				console.log("you shall not pass!");
-				let r_ = board.children[toRow + 2];
-				let h_ = r_.children[toColumn];
-				let p_ = h_.children[0];
+				r = board.children[toRow + 2];
+				h = r.children[toColumn];
+				p = h.children[0];
 				// en passant
-				p_.textContent = "";
+				p.textContent = "";
 			}
 		}
 	}
-	// clear piece
-	p.textContent = "";
 
 
 	r = board.children[toRow];
@@ -279,19 +279,23 @@ function showPossible(row, column) {
 			// take left up
 			r = board.children[row - 1];
 			h = r.children[column - offset];
-			p = h.children[0];
-			piece = p.textContent;
-			if (blackPieces.includes(piece))
-				possible.push([row - 1, column - offset]);
+			if (h != undefined) {
+				p = h.children[0];
+				piece = p.textContent;
+				if (blackPieces.includes(piece))
+					possible.push([row - 1, column - offset]);
+			}
 			// take right up
 			offset = row % 2 == 0;
 			r = board.children[row - 1];
 			h = r.children[column + offset];
-			p = h.children[0];
-			piece = p.textContent;
-			if (blackPieces.includes(piece))
-				possible.push([row - 1, column + offset]);
-			possible = possible.concat(en_passant(row, column));
+			if (h != undefined) {
+				p = h.children[0];
+				piece = p.textContent;
+				if (blackPieces.includes(piece))
+					possible.push([row - 1, column + offset]);
+				possible = possible.concat(en_passant(row, column));
+			}
 			// forward
 			possible.push([row - 2, column]);
 			needsFilter = true;
