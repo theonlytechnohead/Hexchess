@@ -30,7 +30,7 @@ function createBoard() {
 	pulse = document.createElement("pulse");
 	document.getElementsByTagName("main")[0].appendChild(pulse);
 	setTimeout(() => {
-		pulse.destroy();
+		pulse.remove();
 	}, 1000);
 	board = document.createElement("board");
 	document.body.onclick = (e) => {
@@ -109,24 +109,27 @@ function setBoard() {
 	setPieceRaw(7, 3, blackPawn);
 	setPieceRaw(8, 2, blackPawn);
 
-	setPieceRaw(20, 2, whiteBishop);
-	setPieceRaw(19, 2, whiteQueen);
-	setPieceRaw(19, 3, whiteKing);
-	setPieceRaw(18, 1, whiteKnight);
-	setPieceRaw(18, 2, whiteBishop);
-	setPieceRaw(18, 3, whiteKnight);
-	setPieceRaw(17, 1, whiteRook);
-	setPieceRaw(17, 4, whiteRook);
-	setPieceRaw(16, 2, whiteBishop);
-	setPieceRaw(16, 0, whitePawn);
-	setPieceRaw(16, 4, whitePawn);
-	setPieceRaw(15, 1, whitePawn);
-	setPieceRaw(15, 4, whitePawn);
-	setPieceRaw(14, 1, whitePawn);
-	setPieceRaw(14, 3, whitePawn);
-	setPieceRaw(13, 2, whitePawn);
-	setPieceRaw(13, 3, whitePawn);
-	setPieceRaw(12, 2, whitePawn);
+	// setPieceRaw(20, 2, whiteBishop);
+	// setPieceRaw(19, 2, whiteQueen);
+	// setPieceRaw(19, 3, whiteKing);
+	// setPieceRaw(18, 1, whiteKnight);
+	// setPieceRaw(18, 2, whiteBishop);
+	// setPieceRaw(18, 3, whiteKnight);
+	// setPieceRaw(17, 1, whiteRook);
+	// setPieceRaw(17, 4, whiteRook);
+	// setPieceRaw(16, 2, whiteBishop);
+	// setPieceRaw(16, 0, whitePawn);
+	// setPieceRaw(16, 4, whitePawn);
+	// setPieceRaw(15, 1, whitePawn);
+	// setPieceRaw(15, 4, whitePawn);
+	// setPieceRaw(14, 1, whitePawn);
+	// setPieceRaw(14, 3, whitePawn);
+	// setPieceRaw(13, 2, whitePawn);
+	// setPieceRaw(13, 3, whitePawn);
+	// setPieceRaw(12, 2, whitePawn);
+
+	setPieceRaw(12, 2, whiteRook);
+	setPieceRaw(13, 2, whiteRook);
 }
 
 
@@ -175,13 +178,8 @@ function selectSquare(row, column) {
 function highlight(row, column) {
 	board = document.getElementsByTagName("board")[0];
 	r = board.children[row];
-	if (r == undefined)
-		return;
 	h = r.children[column];
-	if (h == undefined)
-		return;
-	if (!whitePieces.includes(h.innerText))
-		h.classList.toggle("possible");
+	h.classList.toggle("possible");
 }
 
 function applyHighlight() {
@@ -192,13 +190,15 @@ function applyHighlight() {
 
 function showPossible(row, column) {
 	applyHighlight();
-	possible = [];
+	// clear array
+	possible.length = 0;
 	board = document.getElementsByTagName("board")[0];
 	r = board.children[row];
 	h = r.children[column];
 	p = h.children[0];
 	piece = p.textContent;
 
+	needsFilter = false;
 	offset = row % 2;
 	switch (piece) {
 		case whitePawn:
@@ -207,6 +207,7 @@ function showPossible(row, column) {
 				possible.push([row - 4, column]);
 			}
 			possible.push([row - 2, column]);
+			needsFilter = true;
 			break;
 		case whiteKing:
 			// forward
@@ -233,6 +234,7 @@ function showPossible(row, column) {
 			possible.push([row + 1, column + 1 - offset]);
 			// backward
 			possible.push([row + 2, column]);
+			needsFilter = true;
 			break;
 		case whiteKnight:
 			// forward
@@ -253,9 +255,138 @@ function showPossible(row, column) {
 			// backward
 			possible.push([row + 5, column - offset]);
 			possible.push([row + 5, column + 1 - offset]);
+			needsFilter = true;
+			break;
+		case whiteRook:
+			// forward
+			currentRow = row;
+			currentColumn = column;
+			do {
+				currentRow -= 2;
+				r = board.children[currentRow];
+				h = r.children[currentColumn];
+				p = h.children[0];
+				piece = p.textContent;
+				if (whitePieces.includes(piece))
+					break;
+				possible.push([currentRow, currentColumn]);
+				end = piece !== "" ||
+					blackPieces.includes(piece) ||
+					currentRow <= 0;
+			} while (!end);
+			// left up
+			currentRow = row;
+			currentColumn = column;
+			do {
+				offset = currentRow % 2;
+				currentRow -= 1;
+				currentColumn -= offset;
+				r = board.children[currentRow];
+				h = r.children[currentColumn];
+				p = h.children[0];
+				piece = p.textContent;
+				if (whitePieces.includes(piece))
+					break;
+				possible.push([currentRow, currentColumn]);
+				end = piece !== "" ||
+					blackPieces.includes(piece) ||
+					currentRow >= 19 ||
+					currentColumn + offset <= 0;
+			} while (!end);
+			// right up
+			currentRow = row;
+			currentColumn = column;
+			do {
+				offset = currentRow % 2 == 0;
+				currentRow -= 1;
+				currentColumn += offset;
+				r = board.children[currentRow];
+				h = r.children[currentColumn];
+				p = h.children[0];
+				piece = p.textContent;
+				if (whitePieces.includes(piece))
+					break;
+				possible.push([currentRow, currentColumn]);
+				end = piece !== "" ||
+					blackPieces.includes(piece) ||
+					currentRow >= 19 ||
+					currentColumn >= 6 - offset;
+			} while (!end);
+			// left down
+			currentRow = row;
+			currentColumn = column;
+			do {
+				offset = currentRow % 2;
+				currentRow += 1;
+				currentColumn -= offset;
+				r = board.children[currentRow];
+				h = r.children[currentColumn];
+				p = h.children[0];
+				piece = p.textContent;
+				if (whitePieces.includes(piece))
+					break;
+				possible.push([currentRow, currentColumn]);
+				end = piece !== "" ||
+					blackPieces.includes(piece) ||
+					currentRow >= 19 ||
+					currentColumn + offset <= 0;
+			} while (!end);
+			// right down
+			currentRow = row;
+			currentColumn = column;
+			do {
+				offset = currentRow % 2 == 0;
+				currentRow += 1;
+				currentColumn += offset;
+				r = board.children[currentRow];
+				h = r.children[currentColumn];
+				p = h.children[0];
+				piece = p.textContent;
+				if (whitePieces.includes(piece))
+					break;
+				possible.push([currentRow, currentColumn]);
+				end = piece !== "" ||
+					blackPieces.includes(piece) ||
+					currentRow >= 19 ||
+					currentColumn >= 6 - offset;
+			} while (!end);
+			// backward
+			currentRow = row;
+			currentColumn = column;
+			do {
+				currentRow += 2;
+				r = board.children[currentRow];
+				h = r.children[currentColumn];
+				p = h.children[0];
+				piece = p.textContent;
+				if (whitePieces.includes(piece))
+					break;
+				possible.push([currentRow, currentColumn]);
+				end = piece !== "" ||
+					blackPieces.includes(piece) ||
+					currentRow >= 19;
+			} while (!end);
 			break;
 		default:
 			break;
 	}
+	// filter invalid moves
+	function invalid(value, index, array) {
+		row = value[0];
+		column = value[1];
+		r = board.children[row];
+		if (r == undefined)
+			return false;
+		h = r.children[column];
+		if (h == undefined)
+			return false;
+		p = h.children[0];
+		piece = p.textContent;
+		if (whitePieces.includes(piece))
+			return false;
+		return true;
+	}
+	if (needsFilter)
+		possible = possible.filter(invalid);
 	applyHighlight();
 }
