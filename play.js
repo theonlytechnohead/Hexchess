@@ -156,11 +156,31 @@ function deselect() {
 	}
 }
 
+function move(fromRow, fromColumn, toRow, toColumn) {
+	board = document.getElementsByTagName("board")[0];
+	r = board.children[fromRow];
+	h = r.children[fromColumn];
+	p = h.children[0];
+	piece = p.textContent;
+	// clear piece
+	p.textContent = "";
+
+	r = board.children[toRow];
+	h = r.children[toColumn];
+	p = h.children[0];
+	p.textContent = piece;
+}
+
 function selectSquare(row, column) {
 	board = document.getElementsByTagName("board")[0];
-	deselect();
 	r = board.children[row];
 	h = r.children[column];
+	if (h.classList.contains("possible")) {
+		move(selectedRow, selectedColumn, row, column);
+		deselect();
+		return false;
+	}
+	deselect();
 	p = h.children[0];
 	piece = p.textContent;
 	if (whitePieces.includes(piece)) {
