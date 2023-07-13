@@ -5,7 +5,7 @@
 	--selected: hsl(50, 50%, 50%);
 	--possible: hsl(25, 75%, 50%);
 	--whiteOutline: white;
-	--blackOutline: white;
+	--blackOutline: black;
 }
 
 @media (prefers-contrast: more) {
@@ -16,7 +16,7 @@
 		--selected: hsl(50, 100%, 50%);
 		--possible: hsl(25, 100%, 50%);
 		--whiteOutline: white;
-		--blackOutline: black;
+		--blackOutline: red;
 	}
 }
 
@@ -151,7 +151,7 @@ hex p {
 
 hex p.black {
 	color: black;
-	-webkit-text-stroke: 0.05em var(--blackOutline);
+	-webkit-text-stroke: 0.025em var(--blackOutline);
 }
 
 hex p.white {
