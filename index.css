@@ -25,7 +25,12 @@ header {
 	right: 1em;
 	display: flex;
 	justify-content: space-between;
+	gap: min(2em, 5vw);
 	align-items: center;
+}
+
+header p {
+	text-align: right;
 }
 
 footer {
@@ -35,11 +40,16 @@ footer {
 	bottom: 1em;
 	display: flex;
 	justify-content: space-between;
+	gap: min(2em, 5vw);
 	align-items: center;
 }
 
 footer p {
 	font-size: min(1.5em, 4vw);
+}
+
+footer p:last-of-type {
+	text-align: right;
 }
 
 main {
@@ -53,12 +63,12 @@ main {
 }
 
 h1 {
-	font-size: min(4em, 15vw);
+	font-size: min(4em, 10vw);
 	margin: 0;
 }
 
 p {
-	font-size: min(1.75em, 4vw);
+	font-size: min(1.75em, 5vw);
 	margin: 0;
 }
 
@@ -67,7 +77,7 @@ a {
 }
 
 button {
-	font-size: 5em;
+	font-size: min(5em, 12vw);
 	width: fit-content;
 	cursor: pointer;
 	padding: 0.25em;
