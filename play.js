@@ -145,12 +145,12 @@ function setPieceRaw(row, column, piece) {
 
 function deselect() {
 	applyHighlight();
-	possible = [];
-	board = document.getElementsByTagName("board")[0];
+	possible.length = 0;
+	let board = document.getElementsByTagName("board")[0];
 	if (selectedRow != null && selectedColumn != null) {
-		r = board.children[selectedRow];
-		h = r.children[selectedColumn];
-		h.classList.remove("selected")
+		let r = board.children[selectedRow];
+		let h = r.children[selectedColumn];
+		h.classList.remove("selected");
 		selectedRow = null;
 		selectedColumn = null;
 	}
@@ -172,17 +172,17 @@ function move(fromRow, fromColumn, toRow, toColumn) {
 }
 
 function selectSquare(row, column) {
-	board = document.getElementsByTagName("board")[0];
-	r = board.children[row];
-	h = r.children[column];
+	let board = document.getElementsByTagName("board")[0];
+	let r = board.children[row];
+	let h = r.children[column];
 	if (h.classList.contains("possible")) {
 		move(selectedRow, selectedColumn, row, column);
 		deselect();
 		return false;
 	}
 	deselect();
-	p = h.children[0];
-	piece = p.textContent;
+	let p = h.children[0];
+	let piece = p.textContent;
 	if (whitePieces.includes(piece)) {
 		selectedRow = row;
 		selectedColumn = column;
