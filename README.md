@@ -2,4 +2,4 @@
 
 A web app for hexagonal chess (chexss)
 
-It's [live](https://theonlytechnohead.github.io/Hexchess/)!
+It's [live](https://hexchess.dev)!
