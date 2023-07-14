@@ -15,6 +15,7 @@ const whiteRook = "♖";
 const whiteBishop = "♗";
 const whiteKnight = "♘";
 const whitePawn = "♙";
+const whiteEnds = [[20, 2], [19, 2], [19, 3], [18, 1], [18, 3], [17, 1], [17, 4], [16, 2], [15, 0], [15, 5]];
 const whitePawns = [[16, 0], [16, 4], [15, 1], [15, 4], [14, 1], [14, 3], [13, 2], [13, 3], [12, 2]];
 const whitePieces = [whiteKing, whiteQueen, whiteRook, whiteBishop, whiteKnight, whitePawn];
 
@@ -24,6 +25,7 @@ const blackRook = "♜";
 const blackBishop = "♝";
 const blackKnight = "♞";
 const blackPawn = "♟︎";
+const blackEnds = [[0, 2], [1, 2], [1, 3], [2, 1], [2, 3], [3, 1], [3, 4], [5, 1], [5, 4], [5, 0], [5, 5]];
 const blackPawns = [[4, 0], [4, 4], [5, 1], [5, 4], [6, 1], [6, 3], [7, 2], [7, 3], [8, 2]];
 const blackPieces = [blackKing, blackQueen, blackRook, blackBishop, blackKnight, blackPawn];
 
@@ -188,6 +190,33 @@ function changeTurn() {
 	otherPawns = turn ? whitePawns : blackPawns;
 }
 
+function choices(row, column) {
+	let choose = document.createElement("choose");
+	var pieces = null;
+	switch (turn) {
+		case WHITE:
+			pieces = [whiteQueen, whiteRook, whiteKnight, whiteBishop];
+			break;
+		case BLACK:
+			pieces = [blackQueen, blackRook, blackKnight, blackBishop];
+			break;
+	}
+	pieces.forEach((p) => {
+		let piece = document.createElement("piece");
+		piece.onclick = () => {
+			choose.remove();
+			playMove(row, column, p);
+		};
+		piece.textContent = p;
+		choose.appendChild(piece);
+	});
+	document.getElementsByTagName("main")[0].appendChild(choose);
+}
+
+function choose(row, column, piece) {
+	playMove(row, column, piece);
+}
+
 function move(fromRow, fromColumn, toRow, toColumn) {
 	let board = document.getElementsByTagName("board")[0];
 	let r = board.children[fromRow];
@@ -235,10 +264,28 @@ function move(fromRow, fromColumn, toRow, toColumn) {
 		}
 	}
 
+	if (piece === currentPawn) {
+		switch (turn) {
+			case WHITE:
+				var endTiles = blackEnds;
+				break;
+			case BLACK:
+				var endTiles = whiteEnds;
+		}
+		let end = endTiles.filter((position) => { return position[0] === toRow && position[1] === toColumn });
+		if (end.length) {
+			choices(toRow, toColumn);
+			return;
+		}
+	}
+	playMove(toRow, toColumn, piece);
+}
 
-	r = board.children[toRow];
-	h = r.children[toColumn];
-	p = h.children[0];
+function playMove(toRow, toColumn, piece) {
+	let board = document.getElementsByTagName("board")[0];
+	let r = board.children[toRow];
+	let h = r.children[toColumn];
+	let p = h.children[0];
 	switch (turn) {
 		case WHITE:
 			p.classList.remove("black");

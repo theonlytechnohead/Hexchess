@@ -211,3 +211,53 @@ pulse {
 	-webkit-clip-path: polygon(50% 0%, 95% 25%, 95% 75%, 50% 100%, 5% 75%, 5% 25%);
 	clip-path: polygon(50% 0%, 95% 25%, 95% 75%, 50% 100%, 5% 75%, 5% 25%);
 }
+
+@keyframes blur {
+	from {
+		backdrop-filter: blur(0);
+	}
+	to {
+		backdrop-filter: blur(min(1em, 2vw, 2vh));
+	}
+}
+
+choose {
+	position: fixed;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	z-index: 1;
+	animation: blur 0.5s ease-in-out 0s 1 forwards;
+
+	display: flex;
+	gap: min(2em, 5vw, 5vh);
+	justify-content: center;
+	align-items: center;
+}
+
+piece {
+	aspect-ratio: 1;
+	width: 1.75em;
+	line-height: 1.75em;
+	text-align: center;
+	font-size: min(8em, 10vw, 10vh);
+	font-family: "Chess";
+	user-select: none;
+	animation: fade 0.5s ease-in-out 0.5s 1 both;
+
+	background-color: var(--accent);
+	transition: background-color 0.15s ease-in-out;
+	-webkit-clip-path: polygon(25% 5%, 75% 5%, 100% 50%, 75% 95%, 25% 95%, 0% 50%);
+	clip-path: polygon(25% 5%, 75% 5%, 100% 50%, 75% 95%, 25% 95%, 0% 50%);
+}
+
+piece:hover {
+	cursor: pointer;
+	background-color: var(--highlight);
+}
+
+piece:active {
+	transition: none;
+	background-color: var(--active);
+}
