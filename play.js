@@ -331,7 +331,18 @@ function showPossible(row, column) {
 		case whitePawn:
 			// starting row (white)
 			if (currentPawns.filter((position) => { return position[0] === row && position[1] === column }).length) {
-				possible.push([row - 4, column]);
+				r = board.children[row - 2];
+				h = r.children[column];
+				p = h.children[0];
+				piece = p.textContent;
+				if (piece === "") {
+					r = board.children[row - 4];
+					h = r.children[column];
+					p = h.children[0];
+					piece = p.textContent;
+					if (piece === "")
+						possible.push([row - 4, column]);
+				}
 			}
 			// take left up
 			r = board.children[row - 1];
@@ -354,13 +365,29 @@ function showPossible(row, column) {
 				possible = possible.concat(en_passant(row, column));
 			}
 			// forward
-			possible.push([row - 2, column]);
+			r = board.children[row - 2];
+			h = r.children[column];
+			p = h.children[0];
+			piece = p.textContent;
+			if (piece === "")
+				possible.push([row - 2, column]);
 			needsFilter = true;
 			break;
 		case blackPawn:
 			// starting row (white)
 			if (currentPawns.filter((position) => { return position[0] === row && position[1] === column }).length) {
-				possible.push([row + 4, column]);
+				r = board.children[row + 2];
+				h = r.children[column];
+				p = h.children[0];
+				piece = p.textContent;
+				if (piece === "") {
+					r = board.children[row + 4];
+					h = r.children[column];
+					p = h.children[0];
+					piece = p.textContent;
+					if (piece === "")
+						possible.push([row + 4, column]);
+				}
 			}
 			// take left up
 			r = board.children[row - 1];
@@ -383,7 +410,12 @@ function showPossible(row, column) {
 				possible = possible.concat(en_passant(row, column));
 			}
 			// forward
-			possible.push([row + 2, column]);
+			r = board.children[row + 2];
+			h = r.children[column];
+			p = h.children[0];
+			piece = p.textContent;
+			if (piece === "")
+				possible.push([row + 2, column]);
 			needsFilter = true;
 			break;
 		case whiteKing:
