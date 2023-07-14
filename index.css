@@ -29,6 +29,10 @@ header {
 	align-items: center;
 }
 
+header h1 span {
+	color: var(--active);
+}
+
 header p {
 	text-align: right;
 }
@@ -63,12 +67,12 @@ main {
 }
 
 h1 {
-	font-size: min(4em, 10vw);
+	font-size: min(4em, 6vw);
 	margin: 0;
 }
 
 p {
-	font-size: min(1.75em, 5vw);
+	font-size: min(2em, 4vw);
 	margin: 0;
 }
 
