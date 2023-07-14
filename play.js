@@ -390,7 +390,7 @@ function showPossible(row, column) {
 				}
 			}
 			// take left up
-			r = board.children[row - 1];
+			r = board.children[row + 1];
 			h = r.children[column - offset];
 			if (h != undefined) {
 				p = h.children[0];
