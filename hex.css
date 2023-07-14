@@ -39,7 +39,19 @@ main {
 
 board {
 	/* offset to make up for the last row */
-	margin-bottom: calc(var(--height) / 2 + var(--margin));
+	padding-bottom: calc(var(--height) / 2 + (var(--margin) * 2));
+}
+
+board.flipped {
+	transform: rotateZ(180deg);
+}
+
+board, p {
+	transition: transform 1s ease-in-out;
+}
+
+board.flipped p {
+	transform: rotateZ(-180deg);
 }
 
 hex {

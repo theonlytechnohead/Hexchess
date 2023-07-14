@@ -4,6 +4,11 @@ function play() {
 	setBoard();
 };
 
+const WHITE = 0;
+const BLACK = 1;
+
+var turn = WHITE;
+
 const whiteKing = "♔";
 const whiteQueen = "♕";
 const whiteRook = "♖";
@@ -22,6 +27,12 @@ const blackPawn = "♟︎";
 const blackPawns = [[4, 0], [4, 4], [5, 1], [5, 4], [6, 1], [6, 3], [7, 2], [7, 3], [8, 2]];
 const blackPieces = [blackKing, blackQueen, blackRook, blackBishop, blackKnight, blackPawn];
 
+var currentPieces = whitePieces;
+var currentPawn = whitePawn;
+var currentPawns = whitePawns;
+var otherPieces = blackPieces;
+var otherPawn = blackPawn;
+var otherPawns = blackPawns;
 
 var selectedRow = null;
 var selectedColumn = null;
@@ -158,6 +169,25 @@ function deselect() {
 	}
 }
 
+function changeTurn() {
+	turn = (turn + 1) % 2;
+	// spin the board!
+	let board = document.getElementsByTagName("board")[0];
+	switch (turn) {
+		case WHITE:
+			board.classList.remove("flipped");
+			break;
+		case BLACK:
+			board.classList.add("flipped");
+	}
+	currentPieces = turn ? blackPieces : whitePieces;
+	currentPawn = turn ? blackPawn : whitePawn;
+	currentPawns = turn ? blackPawns : whitePawns;
+	otherPieces = turn ? whitePieces : blackPieces;
+	otherPawn = turn ? whitePawn : blackPawn;
+	otherPawns = turn ? whitePawns : blackPawns;
+}
+
 function move(fromRow, fromColumn, toRow, toColumn) {
 	let board = document.getElementsByTagName("board")[0];
 	let r = board.children[fromRow];
@@ -166,7 +196,7 @@ function move(fromRow, fromColumn, toRow, toColumn) {
 	let piece = p.textContent;
 	// clear piece
 	p.textContent = "";
-	if (piece === whitePawn) {
+	if (piece === currentPawn) {
 		let moves = en_passant(fromRow, fromColumn);
 		if (moves.length) {
 			if (moves[0][0] === toRow && moves[0][1] === toColumn) {
@@ -185,6 +215,8 @@ function move(fromRow, fromColumn, toRow, toColumn) {
 	h = r.children[toColumn];
 	p = h.children[0];
 	p.textContent = piece;
+
+	changeTurn();
 }
 
 function selectSquare(row, column) {
@@ -199,7 +231,7 @@ function selectSquare(row, column) {
 	deselect();
 	let p = h.children[0];
 	let piece = p.textContent;
-	if (whitePieces.includes(piece)) {
+	if (currentPieces.includes(piece)) {
 		selectedRow = row;
 		selectedColumn = column;
 		h.classList.add("selected")
@@ -226,28 +258,28 @@ function en_passant(row, column) {
 	let possible = [];
 	let offset = row % 2;
 	// en passant left up
-	let en_passant = blackPawns.filter((position) => { return position[0] + 2 === row - 1 && position[1] === column - offset })
+	let en_passant = otherPawns.filter((position) => { return position[0] + 2 === row - 1 && position[1] === column - offset })
 	if (en_passant.length) {
 		let taking = [en_passant[0][0] + 4, en_passant[0][1]];
 		let r = board.children[taking[0]];
 		let h = r.children[taking[1]];
 		let p = h.children[0];
 		let piece = p.textContent;
-		if (piece === blackPawn) {
+		if (piece === otherPawn) {
 			let moving = [en_passant[0][0] + 2, en_passant[0][1]]
 			possible.push(moving);
 		}
 	}
 	// en passant right up
 	offset = row % 2 == 0;
-	en_passant = blackPawns.filter((position) => { return position[0] + 2 === row - 1 && position[1] === column + offset });
+	en_passant = otherPawns.filter((position) => { return position[0] + 2 === row - 1 && position[1] === column + offset });
 	if (en_passant.length) {
 		let taking = [en_passant[0][0] + 4, en_passant[0][1]];
 		let r = board.children[taking[0]];
 		let h = r.children[taking[1]];
 		let p = h.children[0];
 		let piece = p.textContent;
-		if (piece === blackPawn) {
+		if (piece === otherPawn) {
 			let moving = [en_passant[0][0] + 2, en_passant[0][1]]
 			possible.push(moving);
 		}
@@ -273,7 +305,7 @@ function showPossible(row, column) {
 	switch (piece) {
 		case whitePawn:
 			// starting row (white)
-			if (whitePawns.filter((position) => { return position[0] === row && position[1] === column }).length) {
+			if (currentPawns.filter((position) => { return position[0] === row && position[1] === column }).length) {
 				possible.push([row - 4, column]);
 			}
 			// take left up
@@ -282,7 +314,7 @@ function showPossible(row, column) {
 			if (h != undefined) {
 				p = h.children[0];
 				piece = p.textContent;
-				if (blackPieces.includes(piece))
+				if (otherPieces.includes(piece))
 					possible.push([row - 1, column - offset]);
 			}
 			// take right up
@@ -292,7 +324,7 @@ function showPossible(row, column) {
 			if (h != undefined) {
 				p = h.children[0];
 				piece = p.textContent;
-				if (blackPieces.includes(piece))
+				if (otherPieces.includes(piece))
 					possible.push([row - 1, column + offset]);
 				possible = possible.concat(en_passant(row, column));
 			}
@@ -300,7 +332,37 @@ function showPossible(row, column) {
 			possible.push([row - 2, column]);
 			needsFilter = true;
 			break;
+		case blackPawn:
+			// starting row (white)
+			if (currentPawns.filter((position) => { return position[0] === row && position[1] === column }).length) {
+				possible.push([row + 4, column]);
+			}
+			// take left up
+			r = board.children[row - 1];
+			h = r.children[column - offset];
+			if (h != undefined) {
+				p = h.children[0];
+				piece = p.textContent;
+				if (otherPieces.includes(piece))
+					possible.push([row + 1, column - offset]);
+			}
+			// take right up
+			offset = row % 2 == 0;
+			r = board.children[row + 1];
+			h = r.children[column + offset];
+			if (h != undefined) {
+				p = h.children[0];
+				piece = p.textContent;
+				if (otherPieces.includes(piece))
+					possible.push([row + 1, column + offset]);
+				possible = possible.concat(en_passant(row, column));
+			}
+			// forward
+			possible.push([row + 2, column]);
+			needsFilter = true;
+			break;
 		case whiteKing:
+		case blackKing:
 			// forward
 			possible.push([row - 2, column]);
 			// left
@@ -328,6 +390,7 @@ function showPossible(row, column) {
 			needsFilter = true;
 			break;
 		case whiteKnight:
+		case blackKnight:
 			// forward
 			possible.push([row - 5, column - offset]);
 			possible.push([row - 5, column + 1 - offset]);
@@ -349,6 +412,7 @@ function showPossible(row, column) {
 			needsFilter = true;
 			break;
 		case whiteRook:
+		case blackRook:
 			// forward
 			currentRow = row;
 			currentColumn = column;
@@ -362,11 +426,11 @@ function showPossible(row, column) {
 					break;
 				p = h.children[0];
 				piece = p.textContent;
-				if (whitePieces.includes(piece))
+				if (currentPieces.includes(piece))
 					break;
 				possible.push([currentRow, currentColumn]);
 				end = piece !== "" ||
-					blackPieces.includes(piece) ||
+					otherPieces.includes(piece) ||
 					currentRow <= 0;
 			} while (!end);
 			// left up
@@ -384,11 +448,11 @@ function showPossible(row, column) {
 					break;
 				p = h.children[0];
 				piece = p.textContent;
-				if (whitePieces.includes(piece))
+				if (currentPieces.includes(piece))
 					break;
 				possible.push([currentRow, currentColumn]);
 				end = piece !== "" ||
-					blackPieces.includes(piece) ||
+					otherPieces.includes(piece) ||
 					currentRow >= 19 ||
 					currentColumn + offset <= 0;
 			} while (!end);
@@ -407,11 +471,11 @@ function showPossible(row, column) {
 					break;
 				p = h.children[0];
 				piece = p.textContent;
-				if (whitePieces.includes(piece))
+				if (currentPieces.includes(piece))
 					break;
 				possible.push([currentRow, currentColumn]);
 				end = piece !== "" ||
-					blackPieces.includes(piece) ||
+					otherPieces.includes(piece) ||
 					currentRow >= 19 ||
 					currentColumn >= 6 - offset;
 			} while (!end);
@@ -430,11 +494,11 @@ function showPossible(row, column) {
 					break;
 				p = h.children[0];
 				piece = p.textContent;
-				if (whitePieces.includes(piece))
+				if (currentPieces.includes(piece))
 					break;
 				possible.push([currentRow, currentColumn]);
 				end = piece !== "" ||
-					blackPieces.includes(piece) ||
+					otherPieces.includes(piece) ||
 					currentRow >= 19 ||
 					currentColumn + offset <= 0;
 			} while (!end);
@@ -453,11 +517,11 @@ function showPossible(row, column) {
 					break;
 				p = h.children[0];
 				piece = p.textContent;
-				if (whitePieces.includes(piece))
+				if (currentPieces.includes(piece))
 					break;
 				possible.push([currentRow, currentColumn]);
 				end = piece !== "" ||
-					blackPieces.includes(piece) ||
+					otherPieces.includes(piece) ||
 					currentRow >= 19 ||
 					currentColumn >= 6 - offset;
 			} while (!end);
@@ -474,15 +538,16 @@ function showPossible(row, column) {
 					break;
 				p = h.children[0];
 				piece = p.textContent;
-				if (whitePieces.includes(piece))
+				if (currentPieces.includes(piece))
 					break;
 				possible.push([currentRow, currentColumn]);
 				end = piece !== "" ||
-					blackPieces.includes(piece) ||
+					otherPieces.includes(piece) ||
 					currentRow >= 19;
 			} while (!end);
 			break;
 		case whiteBishop:
+		case blackBishop:
 			// left
 			currentRow = row;
 			currentColumn = column;
@@ -496,11 +561,11 @@ function showPossible(row, column) {
 					break;
 				p = h.children[0];
 				piece = p.textContent;
-				if (whitePieces.includes(piece))
+				if (currentPieces.includes(piece))
 					break;
 				possible.push([currentRow, currentColumn]);
 				end = piece !== "" ||
-					blackPieces.includes(piece) ||
+					otherPieces.includes(piece) ||
 					currentRow >= 19 ||
 					currentColumn <= 0;
 			} while (!end);
@@ -519,11 +584,11 @@ function showPossible(row, column) {
 					break;
 				p = h.children[0];
 				piece = p.textContent;
-				if (whitePieces.includes(piece))
+				if (currentPieces.includes(piece))
 					break;
 				possible.push([currentRow, currentColumn]);
 				end = piece !== "" ||
-					blackPieces.includes(piece) ||
+					otherPieces.includes(piece) ||
 					currentRow >= 19 ||
 					currentColumn + offset <= 0;
 			} while (!end);
@@ -541,11 +606,11 @@ function showPossible(row, column) {
 					break;
 				p = h.children[0];
 				piece = p.textContent;
-				if (whitePieces.includes(piece))
+				if (currentPieces.includes(piece))
 					break;
 				possible.push([currentRow, currentColumn]);
 				end = piece !== "" ||
-					blackPieces.includes(piece) ||
+					otherPieces.includes(piece) ||
 					currentRow >= 19 ||
 					currentColumn + offset >= 5;
 			} while (!end);
@@ -564,11 +629,11 @@ function showPossible(row, column) {
 					break;
 				p = h.children[0];
 				piece = p.textContent;
-				if (whitePieces.includes(piece))
+				if (currentPieces.includes(piece))
 					break;
 				possible.push([currentRow, currentColumn]);
 				end = piece !== "" ||
-					blackPieces.includes(piece) ||
+					otherPieces.includes(piece) ||
 					currentRow >= 19 ||
 					currentColumn >= 6 - offset;
 			} while (!end);
@@ -587,11 +652,11 @@ function showPossible(row, column) {
 					break;
 				p = h.children[0];
 				piece = p.textContent;
-				if (whitePieces.includes(piece))
+				if (currentPieces.includes(piece))
 				break;
 				possible.push([currentRow, currentColumn]);
 				end = piece !== "" ||
-					blackPieces.includes(piece) ||
+					otherPieces.includes(piece) ||
 					currentRow >= 18 ||
 					currentColumn + offset <= 0;
 			} while (!end);
@@ -610,16 +675,17 @@ function showPossible(row, column) {
 					break;
 				p = h.children[0];
 				piece = p.textContent;
-				if (whitePieces.includes(piece))
+				if (currentPieces.includes(piece))
 					break;
 				possible.push([currentRow, currentColumn]);
 				end = piece !== "" ||
-					blackPieces.includes(piece) ||
+					otherPieces.includes(piece) ||
 					currentRow >= 18 ||
 					currentColumn >= 6 - offset;
 			} while (!end);
 			break;
 		case whiteQueen:
+		case blackQueen:
 			// rook-like
 			// forward
 			currentRow = row;
@@ -634,11 +700,11 @@ function showPossible(row, column) {
 					break;
 				p = h.children[0];
 				piece = p.textContent;
-				if (whitePieces.includes(piece))
+				if (currentPieces.includes(piece))
 					break;
 				possible.push([currentRow, currentColumn]);
 				end = piece !== "" ||
-					blackPieces.includes(piece) ||
+					otherPieces.includes(piece) ||
 					currentRow <= 0;
 			} while (!end);
 			// left up
@@ -656,11 +722,11 @@ function showPossible(row, column) {
 					break;
 				p = h.children[0];
 				piece = p.textContent;
-				if (whitePieces.includes(piece))
+				if (currentPieces.includes(piece))
 					break;
 				possible.push([currentRow, currentColumn]);
 				end = piece !== "" ||
-					blackPieces.includes(piece) ||
+					otherPieces.includes(piece) ||
 					currentRow >= 19 ||
 					currentColumn + offset <= 0;
 			} while (!end);
@@ -679,11 +745,11 @@ function showPossible(row, column) {
 					break;
 				p = h.children[0];
 				piece = p.textContent;
-				if (whitePieces.includes(piece))
+				if (currentPieces.includes(piece))
 					break;
 				possible.push([currentRow, currentColumn]);
 				end = piece !== "" ||
-					blackPieces.includes(piece) ||
+					otherPieces.includes(piece) ||
 					currentRow >= 19 ||
 					currentColumn >= 6 - offset;
 			} while (!end);
@@ -702,11 +768,11 @@ function showPossible(row, column) {
 					break;
 				p = h.children[0];
 				piece = p.textContent;
-				if (whitePieces.includes(piece))
+				if (currentPieces.includes(piece))
 					break;
 				possible.push([currentRow, currentColumn]);
 				end = piece !== "" ||
-					blackPieces.includes(piece) ||
+					otherPieces.includes(piece) ||
 					currentRow >= 19 ||
 					currentColumn + offset <= 0;
 			} while (!end);
@@ -725,11 +791,11 @@ function showPossible(row, column) {
 					break;
 				p = h.children[0];
 				piece = p.textContent;
-				if (whitePieces.includes(piece))
+				if (currentPieces.includes(piece))
 					break;
 				possible.push([currentRow, currentColumn]);
 				end = piece !== "" ||
-					blackPieces.includes(piece) ||
+					otherPieces.includes(piece) ||
 					currentRow >= 19 ||
 					currentColumn >= 6 - offset;
 			} while (!end);
@@ -746,11 +812,11 @@ function showPossible(row, column) {
 					break;
 				p = h.children[0];
 				piece = p.textContent;
-				if (whitePieces.includes(piece))
+				if (currentPieces.includes(piece))
 					break;
 				possible.push([currentRow, currentColumn]);
 				end = piece !== "" ||
-					blackPieces.includes(piece) ||
+					otherPieces.includes(piece) ||
 					currentRow >= 19;
 			} while (!end);
 			// bishop-like
@@ -767,11 +833,11 @@ function showPossible(row, column) {
 					break;
 				p = h.children[0];
 				piece = p.textContent;
-				if (whitePieces.includes(piece))
+				if (currentPieces.includes(piece))
 					break;
 				possible.push([currentRow, currentColumn]);
 				end = piece !== "" ||
-					blackPieces.includes(piece) ||
+					otherPieces.includes(piece) ||
 					currentRow >= 19 ||
 					currentColumn <= 0;
 			} while (!end);
@@ -790,11 +856,11 @@ function showPossible(row, column) {
 					break;
 				p = h.children[0];
 				piece = p.textContent;
-				if (whitePieces.includes(piece))
+				if (currentPieces.includes(piece))
 					break;
 				possible.push([currentRow, currentColumn]);
 				end = piece !== "" ||
-					blackPieces.includes(piece) ||
+					otherPieces.includes(piece) ||
 					currentRow >= 19 ||
 					currentColumn + offset <= 0;
 			} while (!end);
@@ -812,11 +878,11 @@ function showPossible(row, column) {
 					break;
 				p = h.children[0];
 				piece = p.textContent;
-				if (whitePieces.includes(piece))
+				if (currentPieces.includes(piece))
 					break;
 				possible.push([currentRow, currentColumn]);
 				end = piece !== "" ||
-					blackPieces.includes(piece) ||
+					otherPieces.includes(piece) ||
 					currentRow >= 19 ||
 					currentColumn + offset >= 5;
 			} while (!end);
@@ -835,11 +901,11 @@ function showPossible(row, column) {
 					break;
 				p = h.children[0];
 				piece = p.textContent;
-				if (whitePieces.includes(piece))
+				if (currentPieces.includes(piece))
 					break;
 				possible.push([currentRow, currentColumn]);
 				end = piece !== "" ||
-					blackPieces.includes(piece) ||
+					otherPieces.includes(piece) ||
 					currentRow >= 19 ||
 					currentColumn >= 6 - offset;
 			} while (!end);
@@ -858,11 +924,11 @@ function showPossible(row, column) {
 					break;
 				p = h.children[0];
 				piece = p.textContent;
-				if (whitePieces.includes(piece))
+				if (currentPieces.includes(piece))
 					break;
 				possible.push([currentRow, currentColumn]);
 				end = piece !== "" ||
-					blackPieces.includes(piece) ||
+					otherPieces.includes(piece) ||
 					currentRow >= 18 ||
 					currentColumn + offset <= 0;
 			} while (!end);
@@ -881,11 +947,11 @@ function showPossible(row, column) {
 					break;
 				p = h.children[0];
 				piece = p.textContent;
-				if (whitePieces.includes(piece))
+				if (currentPieces.includes(piece))
 					break;
 				possible.push([currentRow, currentColumn]);
 				end = piece !== "" ||
-					blackPieces.includes(piece) ||
+					otherPieces.includes(piece) ||
 					currentRow >= 18 ||
 					currentColumn >= 6 - offset;
 			} while (!end);
@@ -905,7 +971,7 @@ function showPossible(row, column) {
 			return false;
 		let p = h.children[0];
 		let piece = p.textContent;
-		if (whitePieces.includes(piece))
+		if (currentPieces.includes(piece))
 			return false;
 		return true;
 	}
