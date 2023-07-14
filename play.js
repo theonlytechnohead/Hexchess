@@ -207,22 +207,31 @@ function move(fromRow, fromColumn, toRow, toColumn) {
 	if (piece === currentPawn) {
 		let moves = en_passant(fromRow, fromColumn);
 		if (moves.length) {
-			if (moves[0][0] === toRow && moves[0][1] === toColumn) {
-				console.log("you shall not pass!");
-				r = board.children[toRow + 2];
-				h = r.children[toColumn];
-				p = h.children[0];
-				switch (turn) {
-					case WHITE:
-						p.classList.remove("black");
-						break;
-					case BLACK:
-						p.classList.remove("white");
-						break;
+			moves.forEach(move => {
+				if (move[0] === toRow && move[1] === toColumn) {
+					console.log("you shall not pass!");
+					switch (turn) {
+						case WHITE:
+							var row = +2;
+							break;
+						case BLACK:
+							var row = -2;
+					}
+					r = board.children[toRow + row];
+					h = r.children[toColumn];
+					p = h.children[0];
+					switch (turn) {
+						case WHITE:
+							p.classList.remove("black");
+							break;
+						case BLACK:
+							p.classList.remove("white");
+							break;
+					}
+					// en passant
+					p.textContent = "";
 				}
-				// en passant
-				p.textContent = "";
-			}
+			});
 		}
 	}
 
@@ -279,33 +288,45 @@ function applyHighlight() {
 }
 
 function en_passant(row, column) {
+	switch (turn) {
+		case WHITE:
+			var one = +1;
+			var two = +2;
+			var four = +4;
+			break;
+		case BLACK:
+			var one = -1;
+			var two = -2;
+			var four = -4;
+			break;
+	}
 	let board = document.getElementsByTagName("board")[0];
 	let possible = [];
 	let offset = row % 2;
 	// en passant left up
-	let en_passant = otherPawns.filter((position) => { return position[0] + 2 === row - 1 && position[1] === column - offset })
+	let en_passant = otherPawns.filter((position) => { return position[0] + two === row - one && position[1] === column - offset })
 	if (en_passant.length) {
-		let taking = [en_passant[0][0] + 4, en_passant[0][1]];
+		let taking = [en_passant[0][0] + four, en_passant[0][1]];
 		let r = board.children[taking[0]];
 		let h = r.children[taking[1]];
 		let p = h.children[0];
 		let piece = p.textContent;
 		if (piece === otherPawn) {
-			let moving = [en_passant[0][0] + 2, en_passant[0][1]]
+			let moving = [en_passant[0][0] + two, en_passant[0][1]]
 			possible.push(moving);
 		}
 	}
 	// en passant right up
 	offset = row % 2 == 0;
-	en_passant = otherPawns.filter((position) => { return position[0] + 2 === row - 1 && position[1] === column + offset });
+	en_passant = otherPawns.filter((position) => { return position[0] + two === row - one && position[1] === column + offset });
 	if (en_passant.length) {
-		let taking = [en_passant[0][0] + 4, en_passant[0][1]];
+		let taking = [en_passant[0][0] + four, en_passant[0][1]];
 		let r = board.children[taking[0]];
 		let h = r.children[taking[1]];
 		let p = h.children[0];
 		let piece = p.textContent;
 		if (piece === otherPawn) {
-			let moving = [en_passant[0][0] + 2, en_passant[0][1]]
+			let moving = [en_passant[0][0] + two, en_passant[0][1]]
 			possible.push(moving);
 		}
 	}
