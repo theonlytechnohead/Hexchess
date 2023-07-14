@@ -35,6 +35,7 @@
 main {
 	--height: min(5em, 8vw, 8vh);
 	--margin: calc(var(--height) / 20);
+	overflow: hidden;
 }
 
 board {
