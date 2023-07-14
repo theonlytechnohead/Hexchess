@@ -193,6 +193,14 @@ function move(fromRow, fromColumn, toRow, toColumn) {
 	let r = board.children[fromRow];
 	let h = r.children[fromColumn];
 	let p = h.children[0];
+	switch (turn) {
+		case WHITE:
+			p.classList.remove("white");
+			break;
+		case BLACK:
+			p.classList.remove("black");
+			break;
+	}
 	let piece = p.textContent;
 	// clear piece
 	p.textContent = "";
@@ -204,6 +212,14 @@ function move(fromRow, fromColumn, toRow, toColumn) {
 				r = board.children[toRow + 2];
 				h = r.children[toColumn];
 				p = h.children[0];
+				switch (turn) {
+					case WHITE:
+						p.classList.remove("black");
+						break;
+					case BLACK:
+						p.classList.remove("white");
+						break;
+				}
 				// en passant
 				p.textContent = "";
 			}
@@ -214,6 +230,15 @@ function move(fromRow, fromColumn, toRow, toColumn) {
 	r = board.children[toRow];
 	h = r.children[toColumn];
 	p = h.children[0];
+	switch (turn) {
+		case WHITE:
+			p.classList.remove("black");
+			p.classList.add("white");
+			break;
+		case BLACK:
+			p.classList.remove("white");
+			p.classList.add("black");
+	}
 	p.textContent = piece;
 
 	changeTurn();
@@ -653,7 +678,7 @@ function showPossible(row, column) {
 				p = h.children[0];
 				piece = p.textContent;
 				if (currentPieces.includes(piece))
-				break;
+					break;
 				possible.push([currentRow, currentColumn]);
 				end = piece !== "" ||
 					otherPieces.includes(piece) ||
