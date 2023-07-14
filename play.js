@@ -181,6 +181,7 @@ function changeTurn() {
 			break;
 		case BLACK:
 			board.classList.add("flipped");
+			break;
 	}
 	currentPieces = turn ? blackPieces : whitePieces;
 	currentPawn = turn ? blackPawn : whitePawn;
@@ -201,14 +202,22 @@ function choices(row, column) {
 			pieces = [blackQueen, blackRook, blackKnight, blackBishop];
 			break;
 	}
-	pieces.forEach((p) => {
-		let piece = document.createElement("piece");
-		piece.onclick = () => {
+	pieces.forEach((piece) => {
+		let p = document.createElement("p");
+		switch (turn) {
+			case WHITE:
+				p.classList.add("white");
+				break;
+			case BLACK:
+				p.classList.add("black");
+				break;
+		}
+		p.onclick = () => {
 			choose.remove();
-			playMove(row, column, p);
+			playMove(row, column, piece);
 		};
-		piece.textContent = p;
-		choose.appendChild(piece);
+		p.textContent = piece;
+		choose.appendChild(p);
 	});
 	document.getElementsByTagName("main")[0].appendChild(choose);
 }
@@ -245,6 +254,7 @@ function move(fromRow, fromColumn, toRow, toColumn) {
 							break;
 						case BLACK:
 							var row = -2;
+							break;
 					}
 					r = board.children[toRow + row];
 					h = r.children[toColumn];
@@ -271,6 +281,7 @@ function move(fromRow, fromColumn, toRow, toColumn) {
 				break;
 			case BLACK:
 				var endTiles = whiteEnds;
+				break;
 		}
 		let end = endTiles.filter((position) => { return position[0] === toRow && position[1] === toColumn });
 		if (end.length) {
@@ -294,6 +305,7 @@ function playMove(toRow, toColumn, piece) {
 		case BLACK:
 			p.classList.remove("white");
 			p.classList.add("black");
+			break;
 	}
 	p.textContent = piece;
 
@@ -1080,8 +1092,6 @@ function showPossible(row, column) {
 					currentRow >= 18 ||
 					currentColumn >= 6 - offset;
 			} while (!end);
-			break;
-		default:
 			break;
 	}
 	// filter invalid moves

@@ -4,8 +4,8 @@
 	--tile1: hsl(290, 75%, 50%);
 	--selected: hsl(50, 50%, 50%);
 	--possible: hsl(25, 75%, 50%);
-	--whiteOutline: white;
-	--blackOutline: black;
+	--whiteOutline: 0.025em white;
+	--blackOutline: 0.025em black;
 }
 
 @media (prefers-contrast: more) {
@@ -15,8 +15,8 @@
 		--tile1: hsl(270, 75%, 50%);
 		--selected: hsl(50, 100%, 50%);
 		--possible: hsl(25, 100%, 50%);
-		--whiteOutline: white;
-		--blackOutline: red;
+		--whiteOutline: 0.05em white;
+		--blackOutline: 0.05em red;
 	}
 }
 
@@ -162,14 +162,14 @@ hex p {
 	animation: fade 0.5s ease-in-out 1.5s 1 both;
 }
 
-hex p.black {
+p.black {
 	color: black;
-	-webkit-text-stroke: 0.025em var(--blackOutline);
+	-webkit-text-stroke: var(--blackOutline);
 }
 
-hex p.white {
+p.white {
 	color: white;
-	-webkit-text-stroke: 0.025em var(--whiteOutline);
+	-webkit-text-stroke: var(--whiteOutline);
 }
 
 @keyframes fade {
@@ -236,7 +236,8 @@ choose {
 	align-items: center;
 }
 
-piece {
+choose p {
+	margin: 0;
 	aspect-ratio: 1;
 	width: 1.75em;
 	line-height: 1.75em;
@@ -252,12 +253,12 @@ piece {
 	clip-path: polygon(25% 5%, 75% 5%, 100% 50%, 75% 95%, 25% 95%, 0% 50%);
 }
 
-piece:hover {
+choose p:hover {
 	cursor: pointer;
 	background-color: var(--highlight);
 }
 
-piece:active {
+choose p:active {
 	transition: none;
 	background-color: var(--active);
 }
