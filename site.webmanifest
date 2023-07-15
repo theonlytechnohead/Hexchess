@@ -1,6 +1,6 @@
 {
-    "name": "",
-    "short_name": "",
+    "name": "Hexchess",
+    "short_name": "Hexchess",
     "icons": [
        {
           "src": "/android-chrome-192x192.png",
@@ -13,7 +13,7 @@
         "type": "image/png"
         }
     ],
-    "theme_color": "#FFFFFF",
-    "background_color": "#FFFFFF",
+    "theme_color": "#8020DF",
+    "background_color": "#401070",
     "display": "standalone"
  }
