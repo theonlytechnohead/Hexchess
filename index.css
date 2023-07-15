@@ -87,11 +87,11 @@ button {
 	padding: 0.25em;
 	border: none;
 	border-radius: 0.25em;
-	transition: background-color 0.15s ease-in-out;
 	background-color: var(--accent);
 }
 
 button:hover {
+	transition: background-color 0.15s ease-in-out;
 	background-color: var(--highlight);
 }
 
