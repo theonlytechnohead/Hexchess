@@ -178,6 +178,24 @@ p.white {
 	-webkit-text-stroke: var(--whiteOutline);
 }
 
+@media (forced-colors: active) {
+	hex.tile3,
+	hex.tile2,
+	hex.tile1 {
+		forced-color-adjust: none;
+	}
+
+	p.black {
+		forced-color-adjust: none;
+		-webkit-text-stroke: 0.05em ButtonText;
+	}
+
+	p.white {
+		forced-color-adjust: none;
+		-webkit-text-stroke: 0.05em HighlightText;
+	}
+}
+
 @keyframes fade {
 	from {
 		opacity: 0;
