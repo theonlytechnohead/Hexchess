@@ -262,3 +262,9 @@ choose p:active {
 	transition: none;
 	background-color: var(--active);
 }
+
+@media (prefers-reduced-transparency: reduce) {
+	choose {
+		background-color: var(--accent);
+	}
+}
