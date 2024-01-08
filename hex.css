@@ -51,6 +51,12 @@ board, p {
 	transition: transform 1s ease-in-out;
 }
 
+@media (prefers-reduced-motion: reduce) {
+	board, p {
+		transition: none;
+	}	
+}
+
 board.flipped p {
 	transform: rotateZ(-180deg);
 }
