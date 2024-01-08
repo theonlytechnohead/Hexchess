@@ -30,9 +30,11 @@ const blackPawns = [[4, 0], [4, 4], [5, 1], [5, 4], [6, 1], [6, 3], [7, 2], [7, 
 const blackPieces = [blackKing, blackQueen, blackRook, blackBishop, blackKnight, blackPawn];
 
 var currentPieces = whitePieces;
+var currentKing = whiteKing;
 var currentPawn = whitePawn;
 var currentPawns = whitePawns;
 var otherPieces = blackPieces;
+var otherKing = blackKing;
 var otherPawn = blackPawn;
 var otherPawns = blackPawns;
 
@@ -142,6 +144,9 @@ function setBoard() {
 	setPieceRaw(13, 2, whitePawn);
 	setPieceRaw(13, 3, whitePawn);
 	setPieceRaw(12, 2, whitePawn);
+
+	// setPieceRaw(19, 2, whiteQueen);
+	// setPieceRaw(1, 3, blackKing);
 }
 
 
@@ -184,11 +189,15 @@ function changeTurn() {
 			break;
 	}
 	currentPieces = turn ? blackPieces : whitePieces;
+	currentKing = turn ? blackKing : whiteKing;
 	currentPawn = turn ? blackPawn : whitePawn;
 	currentPawns = turn ? blackPawns : whitePawns;
 	otherPieces = turn ? whitePieces : blackPieces;
+	otherKing = turn ? whiteKing : blackKing;
 	otherPawn = turn ? whitePawn : blackPawn;
 	otherPawns = turn ? whitePawns : blackPawns;
+
+	// check for checkmate?
 }
 
 function choices(row, column) {
@@ -242,6 +251,9 @@ function move(fromRow, fromColumn, toRow, toColumn) {
 	let piece = p.textContent;
 	// clear piece
 	p.textContent = "";
+	if (piece == currentKing) {
+		h.classList.remove("check");
+	}
 	if (piece === currentPawn) {
 		let moves = en_passant(fromRow, fromColumn);
 		if (moves.length) {
@@ -309,7 +321,39 @@ function playMove(toRow, toColumn, piece) {
 	}
 	p.textContent = piece;
 
+	// TODO: check if this player can attack the opposing king?
+	setCheck();
+
 	changeTurn();
+}
+
+function setCheck() {
+	let board = document.getElementsByTagName("board")[0];
+	var attacking = getAttacking(currentPieces);
+	attacking.forEach((coordinate) => {
+		let r = board.children[coordinate[0]];
+		let h = r.children[coordinate[1]];
+		let p = h.children[0];
+		if (p.textContent == otherKing) {
+			h.classList.add("check");
+		}
+	});
+}
+
+function getAttacking(pieces) {
+	let board = document.getElementsByTagName("board")[0];
+	var attacking = [];
+	for (let r = 0; r < board.children.length; r++) {
+		let row = board.children[r];
+		for (let h = 0; h < row.children.length; h++) {
+			let hex = row.children[h];
+			let p = hex.children[0];
+			if (pieces.includes(p.textContent)) {
+				attacking.push(...getPossible(r, h));
+			}
+		}
+	}
+	return attacking;
 }
 
 function selectSquare(row, column) {
@@ -395,8 +439,12 @@ function en_passant(row, column) {
 
 function showPossible(row, column) {
 	applyHighlight();
-	// clear array
-	possible.length = 0;
+	possible = getPossible(row, column);
+	applyHighlight();
+}
+
+function getPossible(row, column) {
+	var possible = [];
 	let board = document.getElementsByTagName("board")[0];
 	let r = board.children[row];
 	let h = r.children[column];
@@ -500,6 +548,7 @@ function showPossible(row, column) {
 			break;
 		case whiteKing:
 		case blackKing:
+			// TODO: test for check/checkmate?
 			// forward
 			possible.push([row - 2, column]);
 			// left
@@ -1095,7 +1144,7 @@ function showPossible(row, column) {
 			break;
 	}
 	// filter invalid moves
-	function invalid(value, index, array) {
+	function isValid(value, index, array) {
 		let row = value[0];
 		let column = value[1];
 		let r = board.children[row];
@@ -1110,7 +1159,26 @@ function showPossible(row, column) {
 			return false;
 		return true;
 	}
-	if (needsFilter)
-		possible = possible.filter(invalid);
-	applyHighlight();
+	if (needsFilter) {
+		possible = possible.filter(isValid);
+	}
+	// filter king-safe moves
+	function kingSafe(value, index, array) {
+		for (const element of attacked) {
+			if (value[0] === element[0] && value[1] === element[1]) {
+				return false;
+			}
+		}
+		return true;
+	}
+	if (piece == currentKing) {
+		// test for checkmate, and/or stalemate
+		var attacked = getAttacking(otherPieces);
+		possible = possible.filter(kingSafe);
+		if (possible.length == 0) {
+			// TODO: test for check
+			// TODO: test for stalemate
+		}
+	}
+	return possible;
 }
