@@ -10,13 +10,13 @@
 
 @media (prefers-contrast: more) {
 	:root {
-		--tile3: hsl(90, 75%, 50%);
-		--tile2: hsl(180, 75%, 50%);
-		--tile1: hsl(270, 75%, 50%);
+		--tile3: hsl(200, 60%, 50%);
+		--tile2: hsl(270, 60%, 50%);
+		--tile1: hsl(320, 60%, 50%);
 		--selected: hsl(50, 100%, 50%);
 		--possible: hsl(25, 100%, 50%);
-		--whiteOutline: 0.05em white;
-		--blackOutline: 0.05em red;
+		--whiteOutline: 0.025em white;
+		--blackOutline: 0.05em black;
 	}
 }
 
