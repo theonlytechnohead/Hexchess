@@ -293,7 +293,7 @@ choose p:active {
 }
 
 @media (prefers-reduced-transparency: reduce) {
-	choose {
+	choose, checkmate {
 		background-color: var(--accent);
 	}
 }
