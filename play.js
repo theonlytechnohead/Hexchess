@@ -1,13 +1,15 @@
 function play() {
 	document.getElementById("play").remove();
 	createBoard();
-	setBoard();
+	setNormalBoard();
+	// setKingsTest();
 };
 
 const WHITE = 0;
 const BLACK = 1;
 
 var turn = WHITE;
+var checkmated = null;
 
 const whiteKing = "♔";
 const whiteQueen = "♕";
@@ -106,7 +108,7 @@ function createBoard() {
 	document.getElementsByTagName("main")[0].appendChild(board);
 }
 
-function setBoard() {
+function setNormalBoard() {
 	setPieceRaw(0, 2, blackBishop);
 	setPieceRaw(1, 2, blackQueen);
 	setPieceRaw(1, 3, blackKing);
@@ -144,9 +146,11 @@ function setBoard() {
 	setPieceRaw(13, 2, whitePawn);
 	setPieceRaw(13, 3, whitePawn);
 	setPieceRaw(12, 2, whitePawn);
+}
 
-	// setPieceRaw(19, 2, whiteQueen);
-	// setPieceRaw(1, 3, blackKing);
+function setKingsTest() {
+	setPieceRaw(19, 2, whiteQueen);
+	setPieceRaw(1, 3, blackKing);
 }
 
 
@@ -197,8 +201,31 @@ function changeTurn() {
 	otherPawn = turn ? whitePawn : blackPawn;
 	otherPawns = turn ? whitePawns : blackPawns;
 
-	// check for checkmate?
+	// check for checkmate
+	// testCheckmate();
 }
+
+// function testCheckmate() {
+// 	// search for a check
+// 	let board = document.getElementsByTagName("board")[0];
+// 	for (var i = 0; i < board.children.length; i++) {
+// 		var row = board.children[i];
+// 		for (var j = 0; j < row.children.length; j++) {
+// 			var hex = row.children[j];
+// 			// if the king is in check
+// 			if (hex.classList.contains("check")) {
+// 				console.log(hex.children[0].innerText);
+// 				// and has nowhere to move
+// 				var moves = getPossible(i, j);
+// 				console.log(moves);
+// 				if (moves.length == 0) {
+// 					// trigger checkmate
+// 					console.log("checkmate?")
+// 				}
+// 			}
+// 		}
+// 	}
+// }
 
 function choices(row, column) {
 	let choose = document.createElement("choose");
@@ -319,12 +346,19 @@ function playMove(toRow, toColumn, piece) {
 			p.classList.add("black");
 			break;
 	}
+	if (p.textContent == otherKing) {
+		// trigger checkmate
+		checkmate(toRow, toColumn);
+	}
+
 	p.textContent = piece;
 
-	// TODO: check if this player can attack the opposing king?
-	setCheck();
-
-	changeTurn();
+	if (!checkmated) {
+		// TODO: check if this player can attack the opposing king?
+		setCheck();
+		changeTurn();
+	}
+	
 }
 
 function setCheck() {
@@ -338,6 +372,22 @@ function setCheck() {
 			h.classList.add("check");
 		}
 	});
+}
+
+function checkmate(row, column) {
+	console.log("checkmate!");
+	switch (turn) {
+		case WHITE:
+			checkmated = BLACK;
+			break;
+		case BLACK:
+			checkmated = WHITE;
+			break;
+	}
+	let board = document.getElementsByTagName("board")[0];
+	let r = board.children[row];
+	let h = r.children[column];
+	h.classList.add("check");
 }
 
 function getAttacking(pieces) {
@@ -357,6 +407,7 @@ function getAttacking(pieces) {
 }
 
 function selectSquare(row, column) {
+	if (checkmated) return false;
 	let board = document.getElementsByTagName("board")[0];
 	let r = board.children[row];
 	let h = r.children[column];
@@ -1163,22 +1214,23 @@ function getPossible(row, column) {
 		possible = possible.filter(isValid);
 	}
 	// filter king-safe moves
-	function kingSafe(value, index, array) {
-		for (const element of attacked) {
-			if (value[0] === element[0] && value[1] === element[1]) {
-				return false;
-			}
-		}
-		return true;
-	}
-	if (piece == currentKing) {
-		// test for checkmate, and/or stalemate
-		var attacked = getAttacking(otherPieces);
-		possible = possible.filter(kingSafe);
-		if (possible.length == 0) {
-			// TODO: test for check
-			// TODO: test for stalemate
-		}
-	}
+	// this is still a bit broken
+	// function kingSafe(value, index, array) {
+	// 	for (const element of attacked) {
+	// 		if (value[0] === element[0] && value[1] === element[1]) {
+	// 			return false;
+	// 		}
+	// 	}
+	// 	return true;
+	// }
+	// if (piece == currentKing) {
+	// 	// test for checkmate, and/or stalemate
+	// 	var attacked = getAttacking(otherPieces);
+	// 	possible = possible.filter(kingSafe);
+	// 	if (possible.length == 0) {
+	// 		// TODO: test for check
+	// 		// TODO: test for stalemate
+	// 	}
+	// }
 	return possible;
 }
