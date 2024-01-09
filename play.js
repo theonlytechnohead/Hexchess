@@ -419,6 +419,8 @@ function displayCheckmate() {
 	again.innerText = "Play again";
 	again.onclick = () => {
 		checkmate.remove();
+		checkmated = NONE;
+		turn = WHITE;
 		play();
 	}
 	checkmate.appendChild(again);
