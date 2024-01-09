@@ -1,15 +1,20 @@
 function play() {
-	document.getElementById("play").remove();
+	if (document.getElementById("play")) {
+		document.getElementById("play").remove();
+	} else {
+		document.getElementsByTagName("board")[0].remove();
+	}
 	createBoard();
 	setNormalBoard();
 	// setKingsTest();
 };
 
+const NONE = -1;
 const WHITE = 0;
 const BLACK = 1;
 
 var turn = WHITE;
-var checkmated = null;
+var checkmated = NONE;
 
 const whiteKing = "♔";
 const whiteQueen = "♕";
@@ -353,10 +358,12 @@ function playMove(toRow, toColumn, piece) {
 
 	p.textContent = piece;
 
-	if (!checkmated) {
+	if (checkmated == NONE) {
 		// TODO: check if this player can attack the opposing king?
 		setCheck();
 		changeTurn();
+	} else {
+		displayCheckmate();
 	}
 	
 }
@@ -376,18 +383,47 @@ function setCheck() {
 
 function checkmate(row, column) {
 	console.log("checkmate!");
-	switch (turn) {
-		case WHITE:
-			checkmated = BLACK;
-			break;
-		case BLACK:
-			checkmated = WHITE;
-			break;
-	}
+	checkmated = turn;
 	let board = document.getElementsByTagName("board")[0];
 	let r = board.children[row];
 	let h = r.children[column];
 	h.classList.add("check");
+}
+
+function displayCheckmate() {
+	let checkmate = document.createElement("checkmate");
+	
+	let h1 = document.createElement("h1");
+	h1.innerText = "Checkmate";
+	checkmate.appendChild(h1);
+	
+	let h2 = document.createElement("h2");
+	switch (checkmated) {
+		case WHITE:
+			h2.innerText = "White wins!";
+			break;
+		case BLACK:
+			h2.innerText = "Black wins!";
+			break;
+	}
+	checkmate.appendChild(h2);
+	
+	let dismiss = document.createElement("button");
+	dismiss.innerText = "Dismiss";
+	dismiss.onclick = () => {
+		checkmate.remove();
+	}
+	checkmate.appendChild(dismiss);
+
+	let again = document.createElement("button");
+	again.innerText = "Play again";
+	again.onclick = () => {
+		checkmate.remove();
+		play();
+	}
+	checkmate.appendChild(again);
+
+	document.getElementsByTagName("main")[0].appendChild(checkmate);
 }
 
 function getAttacking(pieces) {
@@ -407,7 +443,7 @@ function getAttacking(pieces) {
 }
 
 function selectSquare(row, column) {
-	if (checkmated) return false;
+	if (checkmated != NONE) return false;
 	let board = document.getElementsByTagName("board")[0];
 	let r = board.children[row];
 	let h = r.children[column];
