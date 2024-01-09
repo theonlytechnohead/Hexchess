@@ -1,13 +1,20 @@
 function play() {
-	document.getElementById("play").remove();
+	if (document.getElementById("play")) {
+		document.getElementById("play").remove();
+	} else {
+		document.getElementsByTagName("board")[0].remove();
+	}
 	createBoard();
-	setBoard();
+	setNormalBoard();
+	// setKingsTest();
 };
 
+const NONE = -1;
 const WHITE = 0;
 const BLACK = 1;
 
 var turn = WHITE;
+var checkmated = NONE;
 
 const whiteKing = "♔";
 const whiteQueen = "♕";
@@ -30,9 +37,11 @@ const blackPawns = [[4, 0], [4, 4], [5, 1], [5, 4], [6, 1], [6, 3], [7, 2], [7, 
 const blackPieces = [blackKing, blackQueen, blackRook, blackBishop, blackKnight, blackPawn];
 
 var currentPieces = whitePieces;
+var currentKing = whiteKing;
 var currentPawn = whitePawn;
 var currentPawns = whitePawns;
 var otherPieces = blackPieces;
+var otherKing = blackKing;
 var otherPawn = blackPawn;
 var otherPawns = blackPawns;
 
@@ -104,7 +113,7 @@ function createBoard() {
 	document.getElementsByTagName("main")[0].appendChild(board);
 }
 
-function setBoard() {
+function setNormalBoard() {
 	setPieceRaw(0, 2, blackBishop);
 	setPieceRaw(1, 2, blackQueen);
 	setPieceRaw(1, 3, blackKing);
@@ -142,6 +151,11 @@ function setBoard() {
 	setPieceRaw(13, 2, whitePawn);
 	setPieceRaw(13, 3, whitePawn);
 	setPieceRaw(12, 2, whitePawn);
+}
+
+function setKingsTest() {
+	setPieceRaw(19, 2, whiteQueen);
+	setPieceRaw(1, 3, blackKing);
 }
 
 
@@ -184,12 +198,39 @@ function changeTurn() {
 			break;
 	}
 	currentPieces = turn ? blackPieces : whitePieces;
+	currentKing = turn ? blackKing : whiteKing;
 	currentPawn = turn ? blackPawn : whitePawn;
 	currentPawns = turn ? blackPawns : whitePawns;
 	otherPieces = turn ? whitePieces : blackPieces;
+	otherKing = turn ? whiteKing : blackKing;
 	otherPawn = turn ? whitePawn : blackPawn;
 	otherPawns = turn ? whitePawns : blackPawns;
+
+	// check for checkmate
+	// testCheckmate();
 }
+
+// function testCheckmate() {
+// 	// search for a check
+// 	let board = document.getElementsByTagName("board")[0];
+// 	for (var i = 0; i < board.children.length; i++) {
+// 		var row = board.children[i];
+// 		for (var j = 0; j < row.children.length; j++) {
+// 			var hex = row.children[j];
+// 			// if the king is in check
+// 			if (hex.classList.contains("check")) {
+// 				console.log(hex.children[0].innerText);
+// 				// and has nowhere to move
+// 				var moves = getPossible(i, j);
+// 				console.log(moves);
+// 				if (moves.length == 0) {
+// 					// trigger checkmate
+// 					console.log("checkmate?")
+// 				}
+// 			}
+// 		}
+// 	}
+// }
 
 function choices(row, column) {
 	let choose = document.createElement("choose");
@@ -242,6 +283,9 @@ function move(fromRow, fromColumn, toRow, toColumn) {
 	let piece = p.textContent;
 	// clear piece
 	p.textContent = "";
+	if (piece == currentKing) {
+		h.classList.remove("check");
+	}
 	if (piece === currentPawn) {
 		let moves = en_passant(fromRow, fromColumn);
 		if (moves.length) {
@@ -307,12 +351,99 @@ function playMove(toRow, toColumn, piece) {
 			p.classList.add("black");
 			break;
 	}
+	if (p.textContent == otherKing) {
+		// trigger checkmate
+		checkmate(toRow, toColumn);
+	}
+
 	p.textContent = piece;
 
-	changeTurn();
+	if (checkmated == NONE) {
+		// TODO: check if this player can attack the opposing king?
+		setCheck();
+		changeTurn();
+	} else {
+		displayCheckmate();
+	}
+	
+}
+
+function setCheck() {
+	let board = document.getElementsByTagName("board")[0];
+	var attacking = getAttacking(currentPieces);
+	attacking.forEach((coordinate) => {
+		let r = board.children[coordinate[0]];
+		let h = r.children[coordinate[1]];
+		let p = h.children[0];
+		if (p.textContent == otherKing) {
+			h.classList.add("check");
+		}
+	});
+}
+
+function checkmate(row, column) {
+	console.log("checkmate!");
+	checkmated = turn;
+	let board = document.getElementsByTagName("board")[0];
+	let r = board.children[row];
+	let h = r.children[column];
+	h.classList.add("check");
+}
+
+function displayCheckmate() {
+	let checkmate = document.createElement("checkmate");
+	
+	let h1 = document.createElement("h1");
+	h1.innerText = "Checkmate";
+	checkmate.appendChild(h1);
+	
+	let h2 = document.createElement("h2");
+	switch (checkmated) {
+		case WHITE:
+			h2.innerText = "White wins!";
+			break;
+		case BLACK:
+			h2.innerText = "Black wins!";
+			break;
+	}
+	checkmate.appendChild(h2);
+	
+	let dismiss = document.createElement("button");
+	dismiss.innerText = "Dismiss";
+	dismiss.onclick = () => {
+		checkmate.remove();
+	}
+	checkmate.appendChild(dismiss);
+
+	let again = document.createElement("button");
+	again.innerText = "Play again";
+	again.onclick = () => {
+		checkmate.remove();
+		play();
+	}
+	checkmate.appendChild(again);
+
+	document.getElementsByTagName("main")[0].appendChild(checkmate);
+}
+
+function getAttacking(pieces) {
+	let board = document.getElementsByTagName("board")[0];
+	var attacking = [];
+	for (let r = 0; r < board.children.length; r++) {
+		let row = board.children[r];
+		for (let h = 0; h < row.children.length; h++) {
+			let hex = row.children[h];
+			let p = hex.children[0];
+			if (pieces.includes(p.textContent)) {
+				attacking.push(...getPossible(r, h));
+			}
+		}
+	}
+	return attacking;
 }
 
 function selectSquare(row, column) {
+	if (checkmated != NONE) return false;
 	let board = document.getElementsByTagName("board")[0];
 	let r = board.children[row];
 	let h = r.children[column];
@@ -395,8 +526,12 @@ function en_passant(row, column) {
 
 function showPossible(row, column) {
 	applyHighlight();
-	// clear array
-	possible.length = 0;
+	possible = getPossible(row, column);
+	applyHighlight();
+}
+
+function getPossible(row, column) {
+	var possible = [];
 	let board = document.getElementsByTagName("board")[0];
 	let r = board.children[row];
 	let h = r.children[column];
@@ -500,6 +635,7 @@ function showPossible(row, column) {
 			break;
 		case whiteKing:
 		case blackKing:
+			// TODO: test for check/checkmate?
 			// forward
 			possible.push([row - 2, column]);
 			// left
@@ -1095,7 +1231,7 @@ function showPossible(row, column) {
 			break;
 	}
 	// filter invalid moves
-	function invalid(value, index, array) {
+	function isValid(value, index, array) {
 		let row = value[0];
 		let column = value[1];
 		let r = board.children[row];
@@ -1110,7 +1246,27 @@ function showPossible(row, column) {
 			return false;
 		return true;
 	}
-	if (needsFilter)
-		possible = possible.filter(invalid);
-	applyHighlight();
+	if (needsFilter) {
+		possible = possible.filter(isValid);
+	}
+	// filter king-safe moves
+	// this is still a bit broken
+	// function kingSafe(value, index, array) {
+	// 	for (const element of attacked) {
+	// 		if (value[0] === element[0] && value[1] === element[1]) {
+	// 			return false;
+	// 		}
+	// 	}
+	// 	return true;
+	// }
+	// if (piece == currentKing) {
+	// 	// test for checkmate, and/or stalemate
+	// 	var attacked = getAttacking(otherPieces);
+	// 	possible = possible.filter(kingSafe);
+	// 	if (possible.length == 0) {
+	// 		// TODO: test for check
+	// 		// TODO: test for stalemate
+	// 	}
+	// }
+	return possible;
 }

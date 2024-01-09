@@ -2,6 +2,7 @@
 	--tile3: hsl(250, 75%, 50%);
 	--tile2: hsl(270, 75%, 50%);
 	--tile1: hsl(290, 75%, 50%);
+	--check: hsl(0, 75%, 50%);
 	--selected: hsl(50, 50%, 50%);
 	--possible: hsl(25, 75%, 50%);
 	--whiteOutline: 0.025em white;
@@ -81,6 +82,10 @@ hex.tile2 {
 
 hex.tile3 {
 	background-color: var(--tile3);
+}
+
+hex.check {
+	background-color: var(--check);
 }
 
 row {
@@ -245,7 +250,7 @@ pulse {
 	}
 }
 
-choose {
+choose, checkmate {
 	position: fixed;
 	top: 0;
 	left: 0;
@@ -291,4 +296,20 @@ choose p:active {
 	choose {
 		background-color: var(--accent);
 	}
+}
+
+checkmate {
+	flex-direction: column;
+}
+
+checkmate h1 {
+	font-size: 4em;
+}
+
+checkmate h2 {
+	font-size: 2em;
+}
+
+checkmate button {
+	font-size: 3em;
 }
