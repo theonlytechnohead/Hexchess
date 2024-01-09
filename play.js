@@ -96,9 +96,7 @@ function createBoard() {
 					if (selectSquare(r - 1, h))
 						showPossible(r - 1, h);
 					// event is handled, stop propagation now
-					var evt = e ? e : window.event;
-					if (evt.stopPropagation) { evt.stopPropagation(); }
-					else { evt.cancelBubble = true; }
+					e.stopPropagation();
 					return false;
 				};
 			} else {
