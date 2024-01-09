@@ -1,7 +1,7 @@
 body {
-	background-color: white;
+	background-color: transparent;
 }
 
-header, footer {
+header, footer, choose, checkmate {
 	display: none;
 }
