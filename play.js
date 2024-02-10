@@ -7,6 +7,12 @@ function play() {
 	createBoard();
 	setNormalBoard();
 	// setKingsTest();
+
+	// register user confirmation before exiting
+	window.addEventListener('beforeunload', function (e) {
+		e.preventDefault();
+		e.returnValue = true;
+	});
 };
 
 const NONE = -1;
