@@ -1,39 +1,45 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<meta name="color-scheme" content="dark" />
+		<meta name="theme-color" content="#994DE6" />
+		<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+		<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+		<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+		<link rel="manifest" href="/site.webmanifest" />
+		<meta property="og:type" content="website" />
+		<meta property="og:url" content="https://theonlytechnohead.github.io/Hexchess" />
+		<meta property="og:title" content="Hexchess" />
+		<meta property="og:description" content="♟ Hexagonal chess in a browser!" />
+		<meta name="description" content="♟ Hexagonal chess in a browser!" />
+		<title>Hexchess</title>
+		<link rel="stylesheet" href="index.css" />
+		<link rel="stylesheet" href="css/hex.css" />
+		<link rel="stylesheet" href="css/print.css" media="print" />
+		<script type="module" src="js/play.js"></script>
+	</head>
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="color-scheme" content="dark">
-    <meta name="theme-color" content="#994DE6">
-    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
-    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
-    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
-    <link rel="manifest" href="/site.webmanifest">
-    <meta property="og:type" content="website">
-    <meta property="og:url" content="https://theonlytechnohead.github.io/Hexchess">
-    <meta property="og:title" content="Hexchess">
-    <meta property="og:description" content="♟ Hexagonal chess in a browser!">
-    <meta name="description" content="♟ Hexagonal chess in a browser!">
-    <title>Hexchess</title>
-    <link rel="stylesheet" href="index.css">
-    <link rel="stylesheet" href="hex.css">
-    <link rel="stylesheet" href="print.css" media="print">
-    <script src="play.js"></script>
-</head>
-
-<body>
-    <header>
-        <h1><span>⬣</span> Hexchess</h1>
-        <p>Inspired by <a href="https://www.youtube.com/watch?v=bgR3yESAEVE">CGP Grey</a>.</p>
-    </header>
-    <main>
-        <button id="play" onclick="play();">Play!</button>
-    </main>
-    <footer>
-        <p>© Craig Anderson (<a href="https://discord.gg/zaRuA8n4tm">Discord</a>)</p>
-        <p>v1.2 (<a href="https://github.com/theonlytechnohead/Hexchess">source</a>) (<a href="https://anderserver.ddns.net/blog/2023/8">story</a>)</p>
-    </footer>
-</body>
-
+	<body>
+		<header>
+			<h1><span>⬣</span> Hexchess</h1>
+			<p>
+				Inspired by
+				<a href="https://www.youtube.com/watch?v=bgR3yESAEVE">CGP Grey</a>
+			</p>
+		</header>
+		<main>
+			<button id="play" onclick="play();">Play!</button>
+		</main>
+		<footer>
+			<p>© Craig Anderson</p>
+			<p>
+				v1.2.1 (<a href="https://github.com/theonlytechnohead/Hexchess">source</a>) (<a
+					href="https://anderserver.ddns.net/blog/2023/8"
+					>story</a
+				>) (<a href="https://discord.gg/zaRuA8n4tm">discord</a>)
+			</p>
+		</footer>
+	</body>
 </html>

@@ -1,46 +1,53 @@
-function play() {
+import { NONE, BLACK, WHITE } from "./constants.js";
+
+import {
+	whiteKing,
+	whiteQueen,
+	whiteRook,
+	whiteKnight,
+	whiteBishop,
+	whitePawn,
+	whitePawns,
+	whitePieces,
+	whiteEnds,
+} from "./white.js";
+
+import {
+	blackKing,
+	blackQueen,
+	blackRook,
+	blackKnight,
+	blackBishop,
+	blackPawn,
+	blackPawns,
+	blackPieces,
+	blackEnds,
+} from "./black.js";
+
+import { getBoard, setNormalBoard } from "./board.js";
+
+// evil JS global scope hack override thingy to make `onclick` work properly
+window.play = function play() {
+	// if this is the first play session (play button exists)
 	if (document.getElementById("play")) {
+		// yoink the play button
 		document.getElementById("play").remove();
 	} else {
-		document.getElementsByTagName("board")[0].remove();
+		// otherwise, remove the previous board
+		getBoard().remove();
 	}
 	createBoard();
 	setNormalBoard();
 	// setKingsTest();
 
 	// register user confirmation before exiting
-	window.addEventListener('beforeunload', function (e) {
+	window.addEventListener("beforeunload", function (e) {
 		e.preventDefault();
-		e.returnValue = true;
 	});
 };
 
-const NONE = -1;
-const WHITE = 0;
-const BLACK = 1;
-
 var turn = WHITE;
 var checkmated = NONE;
-
-const whiteKing = "♔";
-const whiteQueen = "♕";
-const whiteRook = "♖";
-const whiteBishop = "♗";
-const whiteKnight = "♘";
-const whitePawn = "♙";
-const whiteEnds = [[20, 2], [19, 2], [19, 3], [18, 1], [18, 3], [17, 1], [17, 4], [16, 2], [15, 0], [15, 5]];
-const whitePawns = [[16, 0], [16, 4], [15, 1], [15, 4], [14, 1], [14, 3], [13, 2], [13, 3], [12, 2]];
-const whitePieces = [whiteKing, whiteQueen, whiteRook, whiteBishop, whiteKnight, whitePawn];
-
-const blackKing = "♚";
-const blackQueen = "♛";
-const blackRook = "♜";
-const blackBishop = "♝";
-const blackKnight = "♞";
-const blackPawn = "♟︎";
-const blackEnds = [[0, 2], [1, 2], [1, 3], [2, 1], [2, 3], [3, 1], [3, 4], [5, 1], [5, 4], [5, 0], [5, 5]];
-const blackPawns = [[4, 0], [4, 4], [5, 1], [5, 4], [6, 1], [6, 3], [7, 2], [7, 3], [8, 2]];
-const blackPieces = [blackKing, blackQueen, blackRook, blackBishop, blackKnight, blackPawn];
 
 var currentPieces = whitePieces;
 var currentKing = whiteKing;
@@ -65,28 +72,26 @@ function createBoard() {
 	let board = document.createElement("board");
 	document.body.onclick = (e) => {
 		deselect();
-	}
+	};
 	for (let r = 1; r < 22; r++) {
 		let row = document.createElement("row");
 		if (r < 6) {
 			var n = r;
-			var m = Math.min(4 - n + (r + 1) % 2, 2);
+			var m = Math.min(4 - n + ((r + 1) % 2), 2);
 		} else if (r < 17) {
-			if (r % 2)
-				var n = 5;
-			else
-				var n = 6;
+			if (r % 2) var n = 5;
+			else var n = 6;
 			var m = 0;
 		} else {
 			var n = 22 - r;
-			var m = Math.min(4 - n + (r + 1) % 2, 2);
+			var m = Math.min(4 - n + ((r + 1) % 2), 2);
 		}
 
-		for (let h = 0; h < 6 - r % 2; h++) {
+		for (let h = 0; h < 6 - (r % 2); h++) {
 			let hex = document.createElement("hex");
 			if (h < m) {
 				hex.classList.add("disabled");
-			} else if (m <= h && h < 6 - m - r % 2) {
+			} else if (m <= h && h < 6 - m - (r % 2)) {
 				switch (r % 3) {
 					case 0:
 						hex.classList.add("tile1");
@@ -99,8 +104,7 @@ function createBoard() {
 						break;
 				}
 				hex.onclick = (e) => {
-					if (selectSquare(r - 1, h))
-						showPossible(r - 1, h);
+					if (selectSquare(r - 1, h)) showPossible(r - 1, h);
 					// event is handled, stop propagation now
 					e.stopPropagation();
 					return false;
@@ -117,69 +121,10 @@ function createBoard() {
 	document.getElementsByTagName("main")[0].appendChild(board);
 }
 
-function setNormalBoard() {
-	setPieceRaw(0, 2, blackBishop);
-	setPieceRaw(1, 2, blackQueen);
-	setPieceRaw(1, 3, blackKing);
-	setPieceRaw(2, 1, blackKnight);
-	setPieceRaw(2, 2, blackBishop);
-	setPieceRaw(2, 3, blackKnight);
-	setPieceRaw(3, 1, blackRook);
-	setPieceRaw(3, 4, blackRook);
-	setPieceRaw(4, 2, blackBishop);
-	setPieceRaw(4, 0, blackPawn);
-	setPieceRaw(4, 4, blackPawn);
-	setPieceRaw(5, 1, blackPawn);
-	setPieceRaw(5, 4, blackPawn);
-	setPieceRaw(6, 1, blackPawn);
-	setPieceRaw(6, 3, blackPawn);
-	setPieceRaw(7, 2, blackPawn);
-	setPieceRaw(7, 3, blackPawn);
-	setPieceRaw(8, 2, blackPawn);
-
-	setPieceRaw(20, 2, whiteBishop);
-	setPieceRaw(19, 2, whiteQueen);
-	setPieceRaw(19, 3, whiteKing);
-	setPieceRaw(18, 1, whiteKnight);
-	setPieceRaw(18, 2, whiteBishop);
-	setPieceRaw(18, 3, whiteKnight);
-	setPieceRaw(17, 1, whiteRook);
-	setPieceRaw(17, 4, whiteRook);
-	setPieceRaw(16, 2, whiteBishop);
-	setPieceRaw(16, 0, whitePawn);
-	setPieceRaw(16, 4, whitePawn);
-	setPieceRaw(15, 1, whitePawn);
-	setPieceRaw(15, 4, whitePawn);
-	setPieceRaw(14, 1, whitePawn);
-	setPieceRaw(14, 3, whitePawn);
-	setPieceRaw(13, 2, whitePawn);
-	setPieceRaw(13, 3, whitePawn);
-	setPieceRaw(12, 2, whitePawn);
-}
-
-function setKingsTest() {
-	setPieceRaw(19, 2, whiteQueen);
-	setPieceRaw(1, 3, blackKing);
-}
-
-
-function setPieceRaw(row, column, piece) {
-	let board = document.getElementsByTagName("board")[0];
-	let r = board.children[row];
-	let h = r.children[column];
-	let p = h.children[0];
-	p.textContent = piece;
-	if (blackPieces.includes(piece))
-		p.classList.add("black");
-	else if (whitePieces.includes(piece))
-		p.classList.add("white");
-}
-
-
 function deselect() {
 	applyHighlight();
 	possible.length = 0;
-	let board = document.getElementsByTagName("board")[0];
+	let board = getBoard();
 	if (selectedRow != null && selectedColumn != null) {
 		let r = board.children[selectedRow];
 		let h = r.children[selectedColumn];
@@ -192,7 +137,7 @@ function deselect() {
 function changeTurn() {
 	turn = (turn + 1) % 2;
 	// spin the board!
-	let board = document.getElementsByTagName("board")[0];
+	let board = getBoard();
 	switch (turn) {
 		case WHITE:
 			board.classList.remove("flipped");
@@ -216,7 +161,7 @@ function changeTurn() {
 
 // function testCheckmate() {
 // 	// search for a check
-// 	let board = document.getElementsByTagName("board")[0];
+// 	let board = getBoard();
 // 	for (var i = 0; i < board.children.length; i++) {
 // 		var row = board.children[i];
 // 		for (var j = 0; j < row.children.length; j++) {
@@ -267,12 +212,8 @@ function choices(row, column) {
 	document.getElementsByTagName("main")[0].appendChild(choose);
 }
 
-function choose(row, column, piece) {
-	playMove(row, column, piece);
-}
-
 function move(fromRow, fromColumn, toRow, toColumn) {
-	let board = document.getElementsByTagName("board")[0];
+	let board = getBoard();
 	let r = board.children[fromRow];
 	let h = r.children[fromColumn];
 	let p = h.children[0];
@@ -293,7 +234,7 @@ function move(fromRow, fromColumn, toRow, toColumn) {
 	if (piece === currentPawn) {
 		let moves = en_passant(fromRow, fromColumn);
 		if (moves.length) {
-			moves.forEach(move => {
+			moves.forEach((move) => {
 				if (move[0] === toRow && move[1] === toColumn) {
 					console.log("you shall not pass!");
 					switch (turn) {
@@ -331,7 +272,9 @@ function move(fromRow, fromColumn, toRow, toColumn) {
 				var endTiles = whiteEnds;
 				break;
 		}
-		let end = endTiles.filter((position) => { return position[0] === toRow && position[1] === toColumn });
+		let end = endTiles.filter((position) => {
+			return position[0] === toRow && position[1] === toColumn;
+		});
 		if (end.length) {
 			choices(toRow, toColumn);
 			return;
@@ -341,7 +284,7 @@ function move(fromRow, fromColumn, toRow, toColumn) {
 }
 
 function playMove(toRow, toColumn, piece) {
-	let board = document.getElementsByTagName("board")[0];
+	let board = getBoard();
 	let r = board.children[toRow];
 	let h = r.children[toColumn];
 	let p = h.children[0];
@@ -369,11 +312,10 @@ function playMove(toRow, toColumn, piece) {
 	} else {
 		displayCheckmate();
 	}
-	
 }
 
 function setCheck() {
-	let board = document.getElementsByTagName("board")[0];
+	let board = getBoard();
 	var attacking = getAttacking(currentPieces);
 	attacking.forEach((coordinate) => {
 		let r = board.children[coordinate[0]];
@@ -388,7 +330,7 @@ function setCheck() {
 function checkmate(row, column) {
 	console.log("checkmate!");
 	checkmated = turn;
-	let board = document.getElementsByTagName("board")[0];
+	let board = getBoard();
 	let r = board.children[row];
 	let h = r.children[column];
 	h.classList.add("check");
@@ -396,11 +338,11 @@ function checkmate(row, column) {
 
 function displayCheckmate() {
 	let checkmate = document.createElement("checkmate");
-	
+
 	let h1 = document.createElement("h1");
 	h1.innerText = "Checkmate";
 	checkmate.appendChild(h1);
-	
+
 	let h2 = document.createElement("h2");
 	switch (checkmated) {
 		case WHITE:
@@ -411,12 +353,12 @@ function displayCheckmate() {
 			break;
 	}
 	checkmate.appendChild(h2);
-	
+
 	let dismiss = document.createElement("button");
 	dismiss.innerText = "Dismiss";
 	dismiss.onclick = () => {
 		checkmate.remove();
-	}
+	};
 	checkmate.appendChild(dismiss);
 
 	let again = document.createElement("button");
@@ -426,14 +368,14 @@ function displayCheckmate() {
 		checkmated = NONE;
 		turn = WHITE;
 		play();
-	}
+	};
 	checkmate.appendChild(again);
 
 	document.getElementsByTagName("main")[0].appendChild(checkmate);
 }
 
 function getAttacking(pieces) {
-	let board = document.getElementsByTagName("board")[0];
+	let board = getBoard();
 	var attacking = [];
 	for (let r = 0; r < board.children.length; r++) {
 		let row = board.children[r];
@@ -450,7 +392,7 @@ function getAttacking(pieces) {
 
 function selectSquare(row, column) {
 	if (checkmated != NONE) return false;
-	let board = document.getElementsByTagName("board")[0];
+	let board = getBoard();
 	let r = board.children[row];
 	let h = r.children[column];
 	if (h.classList.contains("possible")) {
@@ -464,21 +406,21 @@ function selectSquare(row, column) {
 	if (currentPieces.includes(piece)) {
 		selectedRow = row;
 		selectedColumn = column;
-		h.classList.add("selected")
+		h.classList.add("selected");
 		return true;
 	}
 	return false;
 }
 
 function highlight(row, column) {
-	let board = document.getElementsByTagName("board")[0];
+	let board = getBoard();
 	let r = board.children[row];
 	let h = r.children[column];
 	h.classList.toggle("possible");
 }
 
 function applyHighlight() {
-	possible.forEach(element => {
+	possible.forEach((element) => {
 		highlight(element[0], element[1]);
 	});
 }
@@ -496,11 +438,13 @@ function en_passant(row, column) {
 			var four = -4;
 			break;
 	}
-	let board = document.getElementsByTagName("board")[0];
+	let board = getBoard();
 	let possible = [];
 	let offset = row % 2;
 	// en passant left up
-	let en_passant = otherPawns.filter((position) => { return position[0] + two === row - one && position[1] === column - offset })
+	let en_passant = otherPawns.filter((position) => {
+		return position[0] + two === row - one && position[1] === column - offset;
+	});
 	if (en_passant.length) {
 		let taking = [en_passant[0][0] + four, en_passant[0][1]];
 		let r = board.children[taking[0]];
@@ -508,13 +452,15 @@ function en_passant(row, column) {
 		let p = h.children[0];
 		let piece = p.textContent;
 		if (piece === otherPawn) {
-			let moving = [en_passant[0][0] + two, en_passant[0][1]]
+			let moving = [en_passant[0][0] + two, en_passant[0][1]];
 			possible.push(moving);
 		}
 	}
 	// en passant right up
 	offset = row % 2 == 0;
-	en_passant = otherPawns.filter((position) => { return position[0] + two === row - one && position[1] === column + offset });
+	en_passant = otherPawns.filter((position) => {
+		return position[0] + two === row - one && position[1] === column + offset;
+	});
 	if (en_passant.length) {
 		let taking = [en_passant[0][0] + four, en_passant[0][1]];
 		let r = board.children[taking[0]];
@@ -522,13 +468,12 @@ function en_passant(row, column) {
 		let p = h.children[0];
 		let piece = p.textContent;
 		if (piece === otherPawn) {
-			let moving = [en_passant[0][0] + two, en_passant[0][1]]
+			let moving = [en_passant[0][0] + two, en_passant[0][1]];
 			possible.push(moving);
 		}
 	}
 	return possible;
 }
-
 
 function showPossible(row, column) {
 	applyHighlight();
@@ -538,7 +483,7 @@ function showPossible(row, column) {
 
 function getPossible(row, column) {
 	var possible = [];
-	let board = document.getElementsByTagName("board")[0];
+	let board = getBoard();
 	let r = board.children[row];
 	let h = r.children[column];
 	let p = h.children[0];
@@ -548,10 +493,15 @@ function getPossible(row, column) {
 	let offset = row % 2;
 	let currentRow;
 	let currentColumn;
+	let end = false;
 	switch (piece) {
 		case whitePawn:
 			// starting row (white)
-			if (currentPawns.filter((position) => { return position[0] === row && position[1] === column }).length) {
+			if (
+				currentPawns.filter((position) => {
+					return position[0] === row && position[1] === column;
+				}).length
+			) {
 				r = board.children[row - 2];
 				h = r.children[column];
 				p = h.children[0];
@@ -561,8 +511,7 @@ function getPossible(row, column) {
 					h = r.children[column];
 					p = h.children[0];
 					piece = p.textContent;
-					if (piece === "")
-						possible.push([row - 4, column]);
+					if (piece === "") possible.push([row - 4, column]);
 				}
 			}
 			// take left up
@@ -571,8 +520,7 @@ function getPossible(row, column) {
 			if (h != undefined) {
 				p = h.children[0];
 				piece = p.textContent;
-				if (otherPieces.includes(piece))
-					possible.push([row - 1, column - offset]);
+				if (otherPieces.includes(piece)) possible.push([row - 1, column - offset]);
 			}
 			// take right up
 			offset = row % 2 == 0;
@@ -581,8 +529,7 @@ function getPossible(row, column) {
 			if (h != undefined) {
 				p = h.children[0];
 				piece = p.textContent;
-				if (otherPieces.includes(piece))
-					possible.push([row - 1, column + offset]);
+				if (otherPieces.includes(piece)) possible.push([row - 1, column + offset]);
 				possible = possible.concat(en_passant(row, column));
 			}
 			// forward
@@ -590,13 +537,16 @@ function getPossible(row, column) {
 			h = r.children[column];
 			p = h.children[0];
 			piece = p.textContent;
-			if (piece === "")
-				possible.push([row - 2, column]);
+			if (piece === "") possible.push([row - 2, column]);
 			needsFilter = true;
 			break;
 		case blackPawn:
 			// starting row (white)
-			if (currentPawns.filter((position) => { return position[0] === row && position[1] === column }).length) {
+			if (
+				currentPawns.filter((position) => {
+					return position[0] === row && position[1] === column;
+				}).length
+			) {
 				r = board.children[row + 2];
 				h = r.children[column];
 				p = h.children[0];
@@ -606,8 +556,7 @@ function getPossible(row, column) {
 					h = r.children[column];
 					p = h.children[0];
 					piece = p.textContent;
-					if (piece === "")
-						possible.push([row + 4, column]);
+					if (piece === "") possible.push([row + 4, column]);
 				}
 			}
 			// take left up
@@ -616,8 +565,7 @@ function getPossible(row, column) {
 			if (h != undefined) {
 				p = h.children[0];
 				piece = p.textContent;
-				if (otherPieces.includes(piece))
-					possible.push([row + 1, column - offset]);
+				if (otherPieces.includes(piece)) possible.push([row + 1, column - offset]);
 			}
 			// take right up
 			offset = row % 2 == 0;
@@ -626,8 +574,7 @@ function getPossible(row, column) {
 			if (h != undefined) {
 				p = h.children[0];
 				piece = p.textContent;
-				if (otherPieces.includes(piece))
-					possible.push([row + 1, column + offset]);
+				if (otherPieces.includes(piece)) possible.push([row + 1, column + offset]);
 				possible = possible.concat(en_passant(row, column));
 			}
 			// forward
@@ -635,8 +582,7 @@ function getPossible(row, column) {
 			h = r.children[column];
 			p = h.children[0];
 			piece = p.textContent;
-			if (piece === "")
-				possible.push([row + 2, column]);
+			if (piece === "") possible.push([row + 2, column]);
 			needsFilter = true;
 			break;
 		case whiteKing:
@@ -695,42 +641,37 @@ function getPossible(row, column) {
 			// forward
 			currentRow = row;
 			currentColumn = column;
+			end = false;
 			do {
 				currentRow -= 2;
 				r = board.children[currentRow];
-				if (r == undefined)
-					break;
+				if (r == undefined) break;
 				h = r.children[currentColumn];
-				if (h == undefined)
-					break;
+				if (h == undefined) break;
 				p = h.children[0];
 				piece = p.textContent;
-				if (currentPieces.includes(piece))
-					break;
+				if (currentPieces.includes(piece)) break;
 				possible.push([currentRow, currentColumn]);
-				end = piece !== "" ||
-					otherPieces.includes(piece) ||
-					currentRow <= 0;
+				end = piece !== "" || otherPieces.includes(piece) || currentRow <= 0;
 			} while (!end);
 			// left up
 			currentRow = row;
 			currentColumn = column;
+			end = false;
 			do {
 				offset = currentRow % 2;
 				currentRow -= 1;
 				currentColumn -= offset;
 				r = board.children[currentRow];
-				if (r == undefined)
-					break;
+				if (r == undefined) break;
 				h = r.children[currentColumn];
-				if (h == undefined)
-					break;
+				if (h == undefined) break;
 				p = h.children[0];
 				piece = p.textContent;
-				if (currentPieces.includes(piece))
-					break;
+				if (currentPieces.includes(piece)) break;
 				possible.push([currentRow, currentColumn]);
-				end = piece !== "" ||
+				end =
+					piece !== "" ||
 					otherPieces.includes(piece) ||
 					currentRow >= 19 ||
 					currentColumn + offset <= 0;
@@ -738,22 +679,21 @@ function getPossible(row, column) {
 			// right up
 			currentRow = row;
 			currentColumn = column;
+			end = false;
 			do {
 				offset = currentRow % 2 == 0;
 				currentRow -= 1;
 				currentColumn += offset;
 				r = board.children[currentRow];
-				if (r == undefined)
-					break;
+				if (r == undefined) break;
 				h = r.children[currentColumn];
-				if (h == undefined)
-					break;
+				if (h == undefined) break;
 				p = h.children[0];
 				piece = p.textContent;
-				if (currentPieces.includes(piece))
-					break;
+				if (currentPieces.includes(piece)) break;
 				possible.push([currentRow, currentColumn]);
-				end = piece !== "" ||
+				end =
+					piece !== "" ||
 					otherPieces.includes(piece) ||
 					currentRow >= 19 ||
 					currentColumn >= 6 - offset;
@@ -761,22 +701,21 @@ function getPossible(row, column) {
 			// left down
 			currentRow = row;
 			currentColumn = column;
+			end = false;
 			do {
 				offset = currentRow % 2;
 				currentRow += 1;
 				currentColumn -= offset;
 				r = board.children[currentRow];
-				if (r == undefined)
-					break;
+				if (r == undefined) break;
 				h = r.children[currentColumn];
-				if (h == undefined)
-					break;
+				if (h == undefined) break;
 				p = h.children[0];
 				piece = p.textContent;
-				if (currentPieces.includes(piece))
-					break;
+				if (currentPieces.includes(piece)) break;
 				possible.push([currentRow, currentColumn]);
-				end = piece !== "" ||
+				end =
+					piece !== "" ||
 					otherPieces.includes(piece) ||
 					currentRow >= 19 ||
 					currentColumn + offset <= 0;
@@ -784,22 +723,21 @@ function getPossible(row, column) {
 			// right down
 			currentRow = row;
 			currentColumn = column;
+			end = false;
 			do {
 				offset = currentRow % 2 == 0;
 				currentRow += 1;
 				currentColumn += offset;
 				r = board.children[currentRow];
-				if (r == undefined)
-					break;
+				if (r == undefined) break;
 				h = r.children[currentColumn];
-				if (h == undefined)
-					break;
+				if (h == undefined) break;
 				p = h.children[0];
 				piece = p.textContent;
-				if (currentPieces.includes(piece))
-					break;
+				if (currentPieces.includes(piece)) break;
 				possible.push([currentRow, currentColumn]);
-				end = piece !== "" ||
+				end =
+					piece !== "" ||
 					otherPieces.includes(piece) ||
 					currentRow >= 19 ||
 					currentColumn >= 6 - offset;
@@ -807,22 +745,18 @@ function getPossible(row, column) {
 			// backward
 			currentRow = row;
 			currentColumn = column;
+			end = false;
 			do {
 				currentRow += 2;
 				r = board.children[currentRow];
-				if (r == undefined)
-					break;
+				if (r == undefined) break;
 				h = r.children[currentColumn];
-				if (h == undefined)
-					break;
+				if (h == undefined) break;
 				p = h.children[0];
 				piece = p.textContent;
-				if (currentPieces.includes(piece))
-					break;
+				if (currentPieces.includes(piece)) break;
 				possible.push([currentRow, currentColumn]);
-				end = piece !== "" ||
-					otherPieces.includes(piece) ||
-					currentRow >= 19;
+				end = piece !== "" || otherPieces.includes(piece) || currentRow >= 19;
 			} while (!end);
 			break;
 		case whiteBishop:
@@ -830,43 +764,37 @@ function getPossible(row, column) {
 			// left
 			currentRow = row;
 			currentColumn = column;
+			end = false;
 			do {
 				currentColumn -= 1;
 				r = board.children[currentRow];
-				if (r == undefined)
-					break;
+				if (r == undefined) break;
 				h = r.children[currentColumn];
-				if (h == undefined)
-					break;
+				if (h == undefined) break;
 				p = h.children[0];
 				piece = p.textContent;
-				if (currentPieces.includes(piece))
-					break;
+				if (currentPieces.includes(piece)) break;
 				possible.push([currentRow, currentColumn]);
-				end = piece !== "" ||
-					otherPieces.includes(piece) ||
-					currentRow >= 19 ||
-					currentColumn <= 0;
+				end = piece !== "" || otherPieces.includes(piece) || currentRow >= 19 || currentColumn <= 0;
 			} while (!end);
 			// left up
 			currentRow = row;
 			currentColumn = column;
+			end = false;
 			do {
 				offset = currentRow % 2;
 				currentRow -= 3;
 				currentColumn -= offset;
 				r = board.children[currentRow];
-				if (r == undefined)
-					break;
+				if (r == undefined) break;
 				h = r.children[currentColumn];
-				if (h == undefined)
-					break;
+				if (h == undefined) break;
 				p = h.children[0];
 				piece = p.textContent;
-				if (currentPieces.includes(piece))
-					break;
+				if (currentPieces.includes(piece)) break;
 				possible.push([currentRow, currentColumn]);
-				end = piece !== "" ||
+				end =
+					piece !== "" ||
 					otherPieces.includes(piece) ||
 					currentRow >= 19 ||
 					currentColumn + offset <= 0;
@@ -874,21 +802,20 @@ function getPossible(row, column) {
 			// right
 			currentRow = row;
 			currentColumn = column;
+			end = false;
 			do {
 				offset = currentRow % 2 == 0;
 				currentColumn += 1;
 				r = board.children[currentRow];
-				if (r == undefined)
-					break;
+				if (r == undefined) break;
 				h = r.children[currentColumn];
-				if (h == undefined)
-					break;
+				if (h == undefined) break;
 				p = h.children[0];
 				piece = p.textContent;
-				if (currentPieces.includes(piece))
-					break;
+				if (currentPieces.includes(piece)) break;
 				possible.push([currentRow, currentColumn]);
-				end = piece !== "" ||
+				end =
+					piece !== "" ||
 					otherPieces.includes(piece) ||
 					currentRow >= 19 ||
 					currentColumn + offset >= 5;
@@ -896,22 +823,21 @@ function getPossible(row, column) {
 			// right up
 			currentRow = row;
 			currentColumn = column;
+			end = false;
 			do {
 				offset = currentRow % 2 == 0;
 				currentRow -= 3;
 				currentColumn += offset;
 				r = board.children[currentRow];
-				if (r == undefined)
-					break;
+				if (r == undefined) break;
 				h = r.children[currentColumn];
-				if (h == undefined)
-					break;
+				if (h == undefined) break;
 				p = h.children[0];
 				piece = p.textContent;
-				if (currentPieces.includes(piece))
-					break;
+				if (currentPieces.includes(piece)) break;
 				possible.push([currentRow, currentColumn]);
-				end = piece !== "" ||
+				end =
+					piece !== "" ||
 					otherPieces.includes(piece) ||
 					currentRow >= 19 ||
 					currentColumn >= 6 - offset;
@@ -919,22 +845,21 @@ function getPossible(row, column) {
 			// left down
 			currentRow = row;
 			currentColumn = column;
+			end = false;
 			do {
 				offset = currentRow % 2;
 				currentRow += 3;
 				currentColumn -= offset;
 				r = board.children[currentRow];
-				if (r == undefined)
-					break;
+				if (r == undefined) break;
 				h = r.children[currentColumn];
-				if (h == undefined)
-					break;
+				if (h == undefined) break;
 				p = h.children[0];
 				piece = p.textContent;
-				if (currentPieces.includes(piece))
-					break;
+				if (currentPieces.includes(piece)) break;
 				possible.push([currentRow, currentColumn]);
-				end = piece !== "" ||
+				end =
+					piece !== "" ||
 					otherPieces.includes(piece) ||
 					currentRow >= 18 ||
 					currentColumn + offset <= 0;
@@ -942,22 +867,21 @@ function getPossible(row, column) {
 			// right down
 			currentRow = row;
 			currentColumn = column;
+			end = false;
 			do {
 				offset = currentRow % 2 == 0;
 				currentRow += 3;
 				currentColumn += offset;
 				r = board.children[currentRow];
-				if (r == undefined)
-					break;
+				if (r == undefined) break;
 				h = r.children[currentColumn];
-				if (h == undefined)
-					break;
+				if (h == undefined) break;
 				p = h.children[0];
 				piece = p.textContent;
-				if (currentPieces.includes(piece))
-					break;
+				if (currentPieces.includes(piece)) break;
 				possible.push([currentRow, currentColumn]);
-				end = piece !== "" ||
+				end =
+					piece !== "" ||
 					otherPieces.includes(piece) ||
 					currentRow >= 18 ||
 					currentColumn >= 6 - offset;
@@ -969,42 +893,37 @@ function getPossible(row, column) {
 			// forward
 			currentRow = row;
 			currentColumn = column;
+			end = false;
 			do {
 				currentRow -= 2;
 				r = board.children[currentRow];
-				if (r == undefined)
-					break;
+				if (r == undefined) break;
 				h = r.children[currentColumn];
-				if (h == undefined)
-					break;
+				if (h == undefined) break;
 				p = h.children[0];
 				piece = p.textContent;
-				if (currentPieces.includes(piece))
-					break;
+				if (currentPieces.includes(piece)) break;
 				possible.push([currentRow, currentColumn]);
-				end = piece !== "" ||
-					otherPieces.includes(piece) ||
-					currentRow <= 0;
+				end = piece !== "" || otherPieces.includes(piece) || currentRow <= 0;
 			} while (!end);
 			// left up
 			currentRow = row;
 			currentColumn = column;
+			end = false;
 			do {
 				offset = currentRow % 2;
 				currentRow -= 1;
 				currentColumn -= offset;
 				r = board.children[currentRow];
-				if (r == undefined)
-					break;
+				if (r == undefined) break;
 				h = r.children[currentColumn];
-				if (h == undefined)
-					break;
+				if (h == undefined) break;
 				p = h.children[0];
 				piece = p.textContent;
-				if (currentPieces.includes(piece))
-					break;
+				if (currentPieces.includes(piece)) break;
 				possible.push([currentRow, currentColumn]);
-				end = piece !== "" ||
+				end =
+					piece !== "" ||
 					otherPieces.includes(piece) ||
 					currentRow >= 19 ||
 					currentColumn + offset <= 0;
@@ -1012,22 +931,21 @@ function getPossible(row, column) {
 			// right up
 			currentRow = row;
 			currentColumn = column;
+			end = false;
 			do {
 				offset = currentRow % 2 == 0;
 				currentRow -= 1;
 				currentColumn += offset;
 				r = board.children[currentRow];
-				if (r == undefined)
-					break;
+				if (r == undefined) break;
 				h = r.children[currentColumn];
-				if (h == undefined)
-					break;
+				if (h == undefined) break;
 				p = h.children[0];
 				piece = p.textContent;
-				if (currentPieces.includes(piece))
-					break;
+				if (currentPieces.includes(piece)) break;
 				possible.push([currentRow, currentColumn]);
-				end = piece !== "" ||
+				end =
+					piece !== "" ||
 					otherPieces.includes(piece) ||
 					currentRow >= 19 ||
 					currentColumn >= 6 - offset;
@@ -1035,22 +953,21 @@ function getPossible(row, column) {
 			// left down
 			currentRow = row;
 			currentColumn = column;
+			end = false;
 			do {
 				offset = currentRow % 2;
 				currentRow += 1;
 				currentColumn -= offset;
 				r = board.children[currentRow];
-				if (r == undefined)
-					break;
+				if (r == undefined) break;
 				h = r.children[currentColumn];
-				if (h == undefined)
-					break;
+				if (h == undefined) break;
 				p = h.children[0];
 				piece = p.textContent;
-				if (currentPieces.includes(piece))
-					break;
+				if (currentPieces.includes(piece)) break;
 				possible.push([currentRow, currentColumn]);
-				end = piece !== "" ||
+				end =
+					piece !== "" ||
 					otherPieces.includes(piece) ||
 					currentRow >= 19 ||
 					currentColumn + offset <= 0;
@@ -1058,22 +975,21 @@ function getPossible(row, column) {
 			// right down
 			currentRow = row;
 			currentColumn = column;
+			end = false;
 			do {
 				offset = currentRow % 2 == 0;
 				currentRow += 1;
 				currentColumn += offset;
 				r = board.children[currentRow];
-				if (r == undefined)
-					break;
+				if (r == undefined) break;
 				h = r.children[currentColumn];
-				if (h == undefined)
-					break;
+				if (h == undefined) break;
 				p = h.children[0];
 				piece = p.textContent;
-				if (currentPieces.includes(piece))
-					break;
+				if (currentPieces.includes(piece)) break;
 				possible.push([currentRow, currentColumn]);
-				end = piece !== "" ||
+				end =
+					piece !== "" ||
 					otherPieces.includes(piece) ||
 					currentRow >= 19 ||
 					currentColumn >= 6 - offset;
@@ -1081,64 +997,54 @@ function getPossible(row, column) {
 			// backward
 			currentRow = row;
 			currentColumn = column;
+			end = false;
 			do {
 				currentRow += 2;
 				r = board.children[currentRow];
-				if (r == undefined)
-					break;
+				if (r == undefined) break;
 				h = r.children[currentColumn];
-				if (h == undefined)
-					break;
+				if (h == undefined) break;
 				p = h.children[0];
 				piece = p.textContent;
-				if (currentPieces.includes(piece))
-					break;
+				if (currentPieces.includes(piece)) break;
 				possible.push([currentRow, currentColumn]);
-				end = piece !== "" ||
-					otherPieces.includes(piece) ||
-					currentRow >= 19;
+				end = piece !== "" || otherPieces.includes(piece) || currentRow >= 19;
 			} while (!end);
 			// bishop-like
 			// left
 			currentRow = row;
 			currentColumn = column;
+			end = false;
 			do {
 				currentColumn -= 1;
 				r = board.children[currentRow];
-				if (r == undefined)
-					break;
+				if (r == undefined) break;
 				h = r.children[currentColumn];
-				if (h == undefined)
-					break;
+				if (h == undefined) break;
 				p = h.children[0];
 				piece = p.textContent;
-				if (currentPieces.includes(piece))
-					break;
+				if (currentPieces.includes(piece)) break;
 				possible.push([currentRow, currentColumn]);
-				end = piece !== "" ||
-					otherPieces.includes(piece) ||
-					currentRow >= 19 ||
-					currentColumn <= 0;
+				end = piece !== "" || otherPieces.includes(piece) || currentRow >= 19 || currentColumn <= 0;
 			} while (!end);
 			// left up
 			currentRow = row;
 			currentColumn = column;
+			end = false;
 			do {
 				offset = currentRow % 2;
 				currentRow -= 3;
 				currentColumn -= offset;
 				r = board.children[currentRow];
-				if (r == undefined)
-					break;
+				if (r == undefined) break;
 				h = r.children[currentColumn];
-				if (h == undefined)
-					break;
+				if (h == undefined) break;
 				p = h.children[0];
 				piece = p.textContent;
-				if (currentPieces.includes(piece))
-					break;
+				if (currentPieces.includes(piece)) break;
 				possible.push([currentRow, currentColumn]);
-				end = piece !== "" ||
+				end =
+					piece !== "" ||
 					otherPieces.includes(piece) ||
 					currentRow >= 19 ||
 					currentColumn + offset <= 0;
@@ -1146,21 +1052,20 @@ function getPossible(row, column) {
 			// right
 			currentRow = row;
 			currentColumn = column;
+			end = false;
 			do {
 				offset = currentRow % 2 == 0;
 				currentColumn += 1;
 				r = board.children[currentRow];
-				if (r == undefined)
-					break;
+				if (r == undefined) break;
 				h = r.children[currentColumn];
-				if (h == undefined)
-					break;
+				if (h == undefined) break;
 				p = h.children[0];
 				piece = p.textContent;
-				if (currentPieces.includes(piece))
-					break;
+				if (currentPieces.includes(piece)) break;
 				possible.push([currentRow, currentColumn]);
-				end = piece !== "" ||
+				end =
+					piece !== "" ||
 					otherPieces.includes(piece) ||
 					currentRow >= 19 ||
 					currentColumn + offset >= 5;
@@ -1168,22 +1073,21 @@ function getPossible(row, column) {
 			// right up
 			currentRow = row;
 			currentColumn = column;
+			end = false;
 			do {
 				offset = currentRow % 2 == 0;
 				currentRow -= 3;
 				currentColumn += offset;
 				r = board.children[currentRow];
-				if (r == undefined)
-					break;
+				if (r == undefined) break;
 				h = r.children[currentColumn];
-				if (h == undefined)
-					break;
+				if (h == undefined) break;
 				p = h.children[0];
 				piece = p.textContent;
-				if (currentPieces.includes(piece))
-					break;
+				if (currentPieces.includes(piece)) break;
 				possible.push([currentRow, currentColumn]);
-				end = piece !== "" ||
+				end =
+					piece !== "" ||
 					otherPieces.includes(piece) ||
 					currentRow >= 19 ||
 					currentColumn >= 6 - offset;
@@ -1191,22 +1095,21 @@ function getPossible(row, column) {
 			// left down
 			currentRow = row;
 			currentColumn = column;
+			end = false;
 			do {
 				offset = currentRow % 2;
 				currentRow += 3;
 				currentColumn -= offset;
 				r = board.children[currentRow];
-				if (r == undefined)
-					break;
+				if (r == undefined) break;
 				h = r.children[currentColumn];
-				if (h == undefined)
-					break;
+				if (h == undefined) break;
 				p = h.children[0];
 				piece = p.textContent;
-				if (currentPieces.includes(piece))
-					break;
+				if (currentPieces.includes(piece)) break;
 				possible.push([currentRow, currentColumn]);
-				end = piece !== "" ||
+				end =
+					piece !== "" ||
 					otherPieces.includes(piece) ||
 					currentRow >= 18 ||
 					currentColumn + offset <= 0;
@@ -1214,22 +1117,21 @@ function getPossible(row, column) {
 			// right down
 			currentRow = row;
 			currentColumn = column;
+			end = false;
 			do {
 				offset = currentRow % 2 == 0;
 				currentRow += 3;
 				currentColumn += offset;
 				r = board.children[currentRow];
-				if (r == undefined)
-					break;
+				if (r == undefined) break;
 				h = r.children[currentColumn];
-				if (h == undefined)
-					break;
+				if (h == undefined) break;
 				p = h.children[0];
 				piece = p.textContent;
-				if (currentPieces.includes(piece))
-					break;
+				if (currentPieces.includes(piece)) break;
 				possible.push([currentRow, currentColumn]);
-				end = piece !== "" ||
+				end =
+					piece !== "" ||
 					otherPieces.includes(piece) ||
 					currentRow >= 18 ||
 					currentColumn >= 6 - offset;
@@ -1241,15 +1143,12 @@ function getPossible(row, column) {
 		let row = value[0];
 		let column = value[1];
 		let r = board.children[row];
-		if (r == undefined)
-			return false;
+		if (r == undefined) return false;
 		let h = r.children[column];
-		if (h == undefined)
-			return false;
+		if (h == undefined) return false;
 		let p = h.children[0];
 		let piece = p.textContent;
-		if (currentPieces.includes(piece))
-			return false;
+		if (currentPieces.includes(piece)) return false;
 		return true;
 	}
 	if (needsFilter) {
